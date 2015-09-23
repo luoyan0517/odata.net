@@ -4,7 +4,7 @@
     <Position X="10" Y="1.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAgAAAAQAAAAAAECAAAAAAAAAAAAEAAAAAAA=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\DataServiceQueryProvider.cs</FileName>
+      <FileName>ALinq\DataServiceQueryProvider.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
@@ -12,112 +12,112 @@
     <Position X="11.75" Y="1.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAA=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\Evaluator.cs</FileName>
+      <FileName>ALinq\Evaluator.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Microsoft.OData.Client.FilterQueryOptionExpression" Collapsed="true">
     <Position X="0.75" Y="2.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAEAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\FilterQueryOptionExpression.cs</FileName>
+      <HashCode>IAAAACAAAAAAACAAAAAAAAAABEAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ALinq\FilterQueryOptionExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Microsoft.OData.Client.InputBinder" Collapsed="true">
     <Position X="13.5" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAgAAgBhAQAAAAAAAAAAAAAAAAABAAAAAAAAgAAAA=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\InputBinder.cs</FileName>
+      <HashCode>AAAAgAAABhAQAAAAAAAAAAQAAAAAABAAAAAAAAgAAAA=</HashCode>
+      <FileName>ALinq\InputBinder.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Microsoft.OData.Client.InputReferenceExpression" Collapsed="true">
     <Position X="15.25" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAABAIAAAACAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\InputReferenceExpression.cs</FileName>
+      <HashCode>AAAAACAAAAAAAABAIAAAACAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>ALinq\InputReferenceExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Microsoft.OData.Client.NavigationPropertySingletonExpression" Collapsed="true">
     <Position X="2.75" Y="5.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAIgAAACIAAAgAQAAAAAAAAAAIAAAAAAAAAAA=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\NavigationPropertySingletonExpression.cs</FileName>
+      <HashCode>AAAAACAAIABAACBAAAgAQAAAAAAACAAIAAAAAAAAAAA=</HashCode>
+      <FileName>ALinq\NavigationPropertySingletonExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Microsoft.OData.Client.OrderByQueryOptionExpression" Collapsed="true">
     <Position X="7.5" Y="2.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AIAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\OrderByQueryOptionExpression.cs</FileName>
+      <HashCode>AIAAACCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ALinq\OrderByQueryOptionExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Microsoft.OData.Client.QueryOptionExpression" Collapsed="true">
     <Position X="4" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\QueryOptionExpression.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAACAAAAAABAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>ALinq\QueryOptionExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Microsoft.OData.Client.ReflectionUtil" Collapsed="true">
     <Position X="10" Y="2.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAIAAIAAAAAAAAAAAAAAAAAAAABgAgAAAI=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\ReflectionUtil.cs</FileName>
+      <HashCode>AAAAAAAIAAAIAAIAAAAAAAAAAAAIAAAACAABgAgAAAI=</HashCode>
+      <FileName>ALinq\ReflectionUtil.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Microsoft.OData.Client.ResourceBinder" Collapsed="true">
     <Position X="11.75" Y="2.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAMCgAAAAACjAIACQBIwBAAAAAgAACEgABAAAMgABEQ=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\ResourceBinder.cs</FileName>
+      <HashCode>AAMCgAAAAAiiCwAOQRAwBCAAAAgCACEEABgIAMgEDGY=</HashCode>
+      <FileName>ALinq\ResourceBinder.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Microsoft.OData.Client.ResourceExpression" Collapsed="true">
     <Position X="1.75" Y="4.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>IAAAAAAAAgAAAAAAAAgAQAAAAACAAAAIAAAAQCAAAAA=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\ResourceExpression.cs</FileName>
+      <HashCode>IhAAUAAAAgBEAAIQDggAUAAAAACBCAAIAQgAQCAYAAA=</HashCode>
+      <FileName>ALinq\ResourceExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Microsoft.OData.Client.ResourceSetExpression" Collapsed="true">
     <Position X="0.5" Y="5.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>QIAABkIAAgACICJAEAiAQAAAgBEAAAAICAEAAEAAEAQ=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\ResourceSetExpression.cs</FileName>
+      <HashCode>AAAAAiAAAAAAAAAAAAAAAAAAAAAAiAAIAAAAAAAAAAA=</HashCode>
+      <FileName>ALinq\ResourceSetExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Microsoft.OData.Client.SkipQueryOptionExpression" Collapsed="true">
     <Position X="3" Y="2.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAgAAAAIAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\SkipQueryOptionExpression.cs</FileName>
+      <HashCode>AAAAACAAAAAAAAAAAAAAiAAAAIAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ALinq\SkipQueryOptionExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Microsoft.OData.Client.TypeSystem" Collapsed="true">
     <Position X="13.5" Y="2.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAABAAQAAAAAAACAAAQAAQABAAAAAEAAAAAAAQIAA=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\TypeSystem.cs</FileName>
+      <HashCode>AgAACBAAQgAAAAAACAAAQACQACAAAAAEAAARAAAQIAA=</HashCode>
+      <FileName>ALinq\TypeSystem.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Microsoft.OData.Client.TakeQueryOptionExpression" Collapsed="true">
     <Position X="5.25" Y="2.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAIAAAACAAAAAAAAAAAA=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\TakeQueryOptionExpression.cs</FileName>
+      <HashCode>AAAAACAAAAAAAAAAAAAACAAAAIAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>ALinq\TakeQueryOptionExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Microsoft.OData.Client.UriHelper" Collapsed="true">
     <Position X="15.25" Y="2.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>PEIABAQAAiUECoABAAAEhAwCAIlIAYAAAAAAEAMAAAA=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\UriHelper.cs</FileName>
+      <HashCode>PEIAhAQAAyUECogBgBAEhA6CAO1IAYAAAgAEECMAAgA=</HashCode>
+      <FileName>ALinq\UriHelper.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Microsoft.OData.Client.UriWriter" Collapsed="true">
     <Position X="10" Y="3.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>IAAAAAAAAAYwBIAAAAAAITSAAAAECFAAABAEAAgAQIA=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\UriWriter.cs</FileName>
+      <HashCode>IAACAgAAAA40BAAAAAAAITSAAAQEClEAABAEAAgAQKg=</HashCode>
+      <FileName>ALinq\UriWriter.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Microsoft.OData.Service.Parsing.WebConvert" Collapsed="true">
@@ -131,14 +131,14 @@
     <Position X="11.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>MtxAyFrP3TX5iX6KkYqMZmSJrHXPjFW3YelGTQTRclA=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\ReflectionUtil.cs</FileName>
+      <FileName>ALinq\ReflectionUtil.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="Microsoft.OData.Client.ResourceExpressionType" Collapsed="true">
     <Position X="10" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AIAAAAAAAABAAAAABAAAAAAAAAAAAECAAAAAAkBAAAA=</HashCode>
-      <FileName>System\Data\Services\Client\ALinq\ResourceExpressionType.cs</FileName>
+      <HashCode>AIAAAAAAQABAAgAABAAAAAAAAAAAAECAAACAAkBAAAA=</HashCode>
+      <FileName>ALinq\ResourceExpressionType.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Font Name="Segoe UI" Size="9" />

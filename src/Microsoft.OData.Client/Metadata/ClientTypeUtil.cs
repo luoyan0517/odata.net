@@ -278,6 +278,11 @@ namespace Microsoft.OData.Client.Metadata
             return model.GetOrCreateEdmType(t).TypeKind == EdmTypeKind.Entity;
         }
 
+        internal static bool TypeIsComplexType(Type t, ClientEdmModel model)
+        {
+            return model.GetOrCreateEdmType(t).TypeKind == EdmTypeKind.Complex;
+        }
+
         /// <summary>
         /// Is the type or element type (in the case of nullableOfT or IEnumOfT) a Entity Type?
         /// </summary>

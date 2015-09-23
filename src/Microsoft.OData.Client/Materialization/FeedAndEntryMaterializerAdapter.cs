@@ -321,6 +321,7 @@ namespace Microsoft.OData.Client.Materialization
 
             MaterializerEntry entry;
             List<ODataNavigationLink> navigationLinks = new List<ODataNavigationLink>();
+            Dictionary<ODataExpandableProperty, ODataNavigationLink> expandablePropertyNavigationLinks = new Dictionary<ODataExpandableProperty, ODataNavigationLink>();
             if (result != null)
             {
                 entry = MaterializerEntry.CreateEntry(
@@ -331,16 +332,34 @@ namespace Microsoft.OData.Client.Materialization
 
                 do
                 {
+                    bool inExpandablePropertyScope = false;
+                    ODataExpandableProperty expandableProperty;
                     this.AssertRead();
 
                     switch (this.reader.State)
                     {
                         case ODataReaderState.NavigationLinkStart:
                             // Cache the list of navigation links here but don't add them to the entry because all of the key properties may not be available yet.
-                            navigationLinks.Add(this.ReadNavigationLink());
+                            if (!inExpandablePropertyScope)
+                            {
+                                navigationLinks.Add(this.ReadNavigationLink());
+                            }
+                            else
+                            {
+                                expandablePropertyNavigationLinks[expandableProperty] = this.ReadNavigationLink();
+                            }
                             break;
                         case ODataReaderState.EntryEnd:
                             break;
+                        case ODataReaderState.ExpandablePropertyStart:
+                            expandableProperty = (ODataExpandableProperty)this.reader.Item;
+                            entry.AddExpandableProperties(expandableProperty);
+                            inExpandablePropertyScope = true;
+                            break;
+
+                        case ODataReaderState.ExpandablePropertyEnd:
+                            inExpandablePropertyScope = false;
+
                         default:
                             throw DSClient.Error.InternalError(InternalError.UnexpectedReadState);
                     }
@@ -362,6 +381,11 @@ namespace Microsoft.OData.Client.Materialization
             foreach (ODataNavigationLink navigationLink in navigationLinks)
             {
                 entry.AddNavigationLink(navigationLink);
+            }
+
+            foreach (var navigationLink in expandablePropertyNavigationLinks)
+            {
+                entry.AddNavigationLinkForExpandableProperty(navigationLink.Key, navigationLink.Value);
             }
 
             return entry;

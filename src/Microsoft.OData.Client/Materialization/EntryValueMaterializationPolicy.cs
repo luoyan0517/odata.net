@@ -24,6 +24,8 @@ namespace Microsoft.OData.Client.Materialization
         /// <summary>Collection->Next Link Table for nested links</summary>
         private readonly Dictionary<IEnumerable, DataServiceQueryContinuation> nextLinkTable;
 
+        private readonly ExpandablePropertyMaterializationPolicy expandablePropertyMaterializationPolicy; 
+
         /// <summary>
         /// Initializes a new instance of the <see cref="EntryValueMaterializationPolicy" /> class.
         /// </summary>
@@ -636,6 +638,16 @@ namespace Microsoft.OData.Client.Materialization
                         }
                     }
                 }
+            }
+
+            // Handle expandable property and its navigation property
+            foreach (var e in entry.ExpandablePropertyNavigationLinks)
+            {
+                ODataExpandableProperty property = e.Key;
+                this.expandablePropertyMaterializationPolicy.MaterializeExpandableProperty(property, e.Value);
+                object value = property.GetMaterializedValue();
+                var prop = actualType.GetProperty(property.Name, this.MaterializerContext.IgnoreMissingProperties);
+                prop.SetValue(entry.ResolvedObject, value, property.Name, true /* allowAdd? */);
             }
 
             foreach (var e in entry.Properties)

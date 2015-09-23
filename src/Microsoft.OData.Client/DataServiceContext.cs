@@ -3045,7 +3045,7 @@ namespace Microsoft.OData.Client
             Util.CheckArgumentNullAndEmpty(propertyName, "propertyName");
 
             ClientTypeAnnotation type = this.model.GetClientTypeAnnotation(this.model.GetOrCreateEdmType(entity.GetType()));
-            Debug.Assert(type.IsEntityType, "must be entity type to be contained");
+        //    Debug.Assert(type.IsEntityType, "must be entity type to be contained");
 
             if (EntityStates.Added == box.State)
             {
@@ -3080,7 +3080,14 @@ namespace Microsoft.OData.Client
                 }
                 else
                 {
-                    requestUri = box.GetNavigationLink(this.baseUriResolver, property);
+                    if (type.IsEntityType)
+                    {
+                        requestUri = box.GetNavigationLink(this.baseUriResolver, property);
+                    }
+                    else 
+                    { 
+                        
+                    }
                 }
             }
 

@@ -77,6 +77,16 @@ namespace Microsoft.OData.Client.Materialization
             SetMaterializedValueCore(complexValue, materializedValue);
         }
 
+        public static void SetMaterializedValue(this ODataExpandableProperty property, object materializedValue)
+        {}
+
+        public static void GetMaterializedValue(this ODataExpandableProperty, object materializedValue)
+        {}
+
+        public static void SetMaterializedValue(this ODataExpandableProperty, object materializedValue)
+        {}
+
+
         /// <summary>
         /// Gets the materialized value.
         /// </summary>

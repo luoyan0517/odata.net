@@ -179,6 +179,7 @@
       <Link>ALinq\UriParser\SyntacticAst\UnaryOperatorToken.cs</Link>
     </Compile>
     <Compile Include="Annotation\AnnotationHelper.cs" />
+    <Compile Include="ComplexTypeDescriptor.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="DataServiceActionQueryOfT.cs" />
     <Compile Include="ActionDescriptor.cs" />
@@ -211,6 +212,7 @@
     <Compile Include="DataServiceClientMessageReaderSettingsShim.cs" />
     <Compile Include="DataServiceQuerySingleOfT.cs" />
     <Compile Include="Materialization\EnumValueMaterializationPolicy.cs" />
+    <Compile Include="Materialization\ExpandablePropertyMaterializationPolicy.cs" />
     <Compile Include="Materialization\InstanceAnnotationMaterializationPolicy.cs" />
     <Compile Include="Materialization\ODataLoadNavigationPropertyMaterializer.cs" />
     <Compile Include="DataServiceClientRequestMessageArgs.cs" />
@@ -425,7 +427,9 @@
   <!-- Class Diagrams -->
   <ItemGroup>
     <None Include="Diagrams\ALinq.cd" />
-    <None Include="Diagrams\Materialization.cd" />
+    <None Include="Diagrams\Materialization.cd">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Microsoft.OData.Client.Common.txt" />

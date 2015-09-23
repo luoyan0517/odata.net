@@ -46,6 +46,8 @@ namespace Microsoft.OData.Client
         /// <exception cref="InvalidOperationException">if identity is pointing to another entity</exception>
         internal abstract EntityDescriptor InternalAttachEntityDescriptor(EntityDescriptor entityDescriptorFromMaterializer, bool failIfDuplicated);
 
+        internal abstract void InternalAddComplexTypeDescriptor(object complexValue, ComplexTypeDescriptor descriptor);
+
         /// <summary>
         /// verify the resource being tracked by context
         /// </summary>

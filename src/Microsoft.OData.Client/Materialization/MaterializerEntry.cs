@@ -21,6 +21,9 @@ namespace Microsoft.OData.Client.Materialization
         /// <summary>The entry.</summary>
         private readonly ODataEntry entry;
 
+        /// <summary>The Expandable Properties</summary>
+        private Dictionary<ODataExpandableProperty, ICollection<ODataNavigationLink>> expandableProperties = new Dictionary<ODataExpandableProperty, ICollection<ODataNavigationLink>>();
+
         /// <summary>entity descriptor object which keeps track of the entity state and other entity specific information.</summary>
         private readonly EntityDescriptor entityDescriptor;
 
@@ -285,6 +288,23 @@ namespace Microsoft.OData.Client.Materialization
             this.navigationLinks.Add(link);
         }
 
+        public void AddExpandableProperties(ODataExpandableProperty expandableProperty)
+        {
+            this.expandableProperties[ODataExpandableProperty] = ODataMaterializer.EmptyLinks;
+        }
+
+        public void AddNavigationLinkForExpandableProperty(ODataExpandableProperty expandableProperty, ODataNavigationLink navigationLink)
+        {
+            this.expandableProperties[ODataExpandableProperty].Add(navigationLink);
+        }
+
+        public Dictionary<ODataExpandableProperty, ICollection<ODataNavigationLink>>  ExpandablePropertyNavigationLinks 
+        { 
+            get{
+                return this.expandableProperties;
+            }
+        }
+
         /// <summary>
         /// Updates the entity descriptor.
         /// </summary>
@@ -362,6 +382,20 @@ namespace Microsoft.OData.Client.Materialization
                         {
                             this.EntityDescriptor.AddOperationDescriptor(new ActionDescriptor { Title = action.Title, Metadata = action.Metadata, Target = action.Target });
                         }
+                    }
+
+                    // Add complex type descriptors
+                    foreach (var e in expandableProperties)
+                    {
+                        var identity = new Uri(this.EntityDescriptor.EditLink, e.Key.Name, true);
+                        ComplexTypeDescriptor de = new ComplexTypeDescriptor() { PropertyName = e.Key.Name, Identity = identity};
+
+                        foreach (ODataNavigationLink nl in e.Value)
+                        {
+                            de.AddNavigationLink(nl.Name, nl.Url);
+                        }
+
+                        this.EntityDescriptor.AddComplexTypeDescriptor(de.PropertyName, de);
                     }
                 }
 

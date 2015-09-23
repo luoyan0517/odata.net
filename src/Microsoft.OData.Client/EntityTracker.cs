@@ -29,6 +29,9 @@ namespace Microsoft.OData.Client
         /// <summary>Set of tracked resources</summary>
         private Dictionary<object, EntityDescriptor> entityDescriptors = new Dictionary<object, EntityDescriptor>(EqualityComparer<object>.Default);
 
+        /// <summary>Set of tracked expandable property resources</summary>
+        private Dictionary<object, ComplexTypeDescriptor> complexTypeDescriptors = new Dictionary<object, ComplexTypeDescriptor>(EqualityComparer<object>.Default);
+
         /// <summary>Set of tracked resources by Identity</summary>
         private Dictionary<Uri, EntityDescriptor> identityToDescriptor;
 
@@ -93,6 +96,14 @@ namespace Microsoft.OData.Client
             return entityDescriptor;
         }
 
+        public ComplexTypeDescriptor TryGetComplexDescriptor(object complexValue)
+        {
+            Debug.Assert(complexValue != null, "entity != null");
+            ComplexTypeDescriptor complexTypeDescriptor = null;
+            this.complexTypeDescriptors.TryGetValue(complexValue, out complexTypeDescriptor);
+            return complexTypeDescriptor;
+        }
+
         /// <summary>
         /// verify the resource being tracked by context
         /// </summary>
@@ -104,7 +115,12 @@ namespace Microsoft.OData.Client
             EntityDescriptor entityDescriptor = this.TryGetEntityDescriptor(resource);
             if (entityDescriptor == null)
             {
-                throw Error.InvalidOperation(Strings.Context_EntityNotContained);
+                ComplexTypeDescriptor complexDescriptor = this.TryGetComplexDescriptor(resource);
+                if (complexDescriptor == null) 
+                {
+                    throw Error.InvalidOperation(Strings.Context_EntityNotContained);                
+                }
+                entityDescriptor = complexDescriptor.Entity;
             }
 
             return entityDescriptor;
@@ -486,6 +502,11 @@ namespace Microsoft.OData.Client
             // we used to mark the descriptor as Unchanged
             // but it's now up to the caller to do that
             return trackedEntityDescriptor;
+        }
+
+        internal void InternalAddComplexTypeDescriptor(object complexValue, ComplexTypeDescriptor descriptor)
+        {
+            this.ComplexTypeDescriptors.Add(complexValue, descriptor);
         }
 
         /// <summary>

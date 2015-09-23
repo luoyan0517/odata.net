@@ -285,7 +285,7 @@ namespace Microsoft.OData.Client
                     // If we can't determine an expected element type, for whatever reason, then we cannot construct an expected collection type.
                     return null;
                 }
-
+    
                 return new EdmCollectionType(elementEdmType.ToEdmTypeReference(clientEdmElementType.IsNullable));
             }
 

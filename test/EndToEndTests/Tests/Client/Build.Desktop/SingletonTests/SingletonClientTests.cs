@@ -32,8 +32,22 @@ namespace Microsoft.Test.OData.Tests.Client.SingletonTests
             {
                 //Query Singleton
                 TestClientContext.MergeOption = Microsoft.OData.Client.MergeOption.OverwriteChanges;
+
+                var em = TestClientContext.Employees.ToArray();
+
+                //var addr = TestClientContext.CreateQuery<Address>("Company/Address").Execute();
+                //foreach (var d in addr)
+                //{
+                //    var city1 = d.City;
+                //}
+
                 var company = TestClientContext.Company.GetValue();
                 Assert.IsTrue(company != null);
+
+                TestClientContext.LoadProperty(company, "VipCustomer");
+
+                var address = company.Address;
+                TestClientContext.LoadProperty(address, "City");
 
                 //Update Singleton Property and Verify
                 company.CompanyCategory = CompanyCategory.Communication;

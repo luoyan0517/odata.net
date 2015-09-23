@@ -25,6 +25,9 @@ namespace Microsoft.OData.Client
 
         /// <summary>Service Operation descriptor</summary>
         OperationDescriptor,
+
+        /// <summary>ExpandableProperty Descriptor</summary>
+        ExpandableProperty,
     }
 
     /// <summary>Abstract class from which <see cref="T:Microsoft.OData.Client.EntityDescriptor" /> is derived.</summary>

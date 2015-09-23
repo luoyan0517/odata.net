@@ -55,6 +55,10 @@
       <Project>{D1567C63-4A0D-4E18-A14E-79699B9BA325}</Project>
       <Name>Microsoft.OData.Service</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\FunctionalTests\Tests\DataOData\Tests\OData.PluggableFormat\Microsoft.Test.OData.PluggableFormat.csproj">
+      <Project>{1d872f31-6100-4c76-999e-ed948e2cd248}</Project>
+      <Name>Microsoft.Test.OData.PluggableFormat</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Framework\Core\Microsoft.Test.OData.Framework.csproj">
       <Project>{CEC8AF29-77BC-4C62-B79C-A9B22C311E3B}</Project>
       <Name>Microsoft.Test.OData.Framework</Name>
@@ -74,10 +78,6 @@
     <ProjectReference Include="..\..\..\Services\CSDSCReferences\Microsoft.Test.OData.Services.CSDSCReferences.csproj">
       <Project>{ae503558-f7bc-4ce4-9a90-066b580bb1ed}</Project>
       <Name>Microsoft.Test.OData.Services.CSDSCReferences</Name>
-    </ProjectReference>
-    <ProjectReference Include="$(EnlistmentRoot)\test\FunctionalTests\Tests\DataOData\Tests\OData.PluggableFormat\Microsoft.Test.OData.PluggableFormat.csproj">
-      <Project>{1d872f31-6100-4c76-999e-ed948e2cd248}</Project>
-      <Name>Microsoft.Test.OData.PluggableFormat</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

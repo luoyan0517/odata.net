@@ -21,15 +21,10 @@ namespace Microsoft.OData.Client
     /// represents the cached entity
     /// </summary>
     [DebuggerDisplay("State = {state}, Uri = {editLink}, Element = {entity.GetType().ToString()}")]
-    public sealed class EntityDescriptor : Descriptor
+    public sealed class EntityDescriptor : ResourceDescriptor
     {
         #region Fields
-        /// <summary>uri to identitfy the entity</summary>
-        /// <remarks>&lt;atom:id&gt;identity&lt;/id&gt;</remarks>
-        private Uri identity;
 
-        /// <summary>entity</summary>
-        private object entity;
 
         /// <summary>tracks information about the default stream, if any.</summary>
         private StreamDescriptor defaultStreamDescriptor;
@@ -46,11 +41,6 @@ namespace Microsoft.OData.Client
         private Uri editLink;
 
         /// <summary>
-        /// Contains the LinkInfo (navigation and relationship links) for navigation properties
-        /// </summary>
-        private Dictionary<string, LinkInfo> relatedEntityLinks;
-
-        /// <summary>
         /// entity descriptor instance which contains metadata from responses which haven't been fully processed/materialized yet.
         /// This is used only in non-batch SaveChanges scenario.
         /// </summary>
@@ -61,6 +51,9 @@ namespace Microsoft.OData.Client
 
         /// <summary>List of service operation descriptors for this entity.</summary>
         private List<OperationDescriptor> operationDescriptors;
+
+        /// <summary>List of expandable property descriptors for this entity.</summary>
+        private Dictionary<string, ComplexTypeDescriptor> complexTypeDescriptors;
 
         #endregion
 
@@ -774,6 +767,22 @@ namespace Microsoft.OData.Client
             {
                 this.operationDescriptors.Clear();
             }
+        }
+
+        internal void AddComplexTypeDescriptor(string propertyName, ComplexTypeDescriptor propertyDescriptor)
+        {
+            if (this.ComplexTypeDescriptors == null)
+            {
+                this.ComplexTypeDescriptors = new Dictionary<string, ComplexTypeDescriptor>();
+            }
+
+            this.ComplexTypeDescriptors[propertyName] = propertyDescriptor;
+        }
+
+
+        internal ComplexTypeDescriptor GetComplexTypeDescriptor(string propertyName)
+        {
+            return this.ComplexTypeDescriptors[propertyName];
         }
 
         /// <summary>

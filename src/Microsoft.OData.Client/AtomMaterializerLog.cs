@@ -190,6 +190,16 @@ namespace Microsoft.OData.Client
                 EntityDescriptor descriptor = this.entityTracker.InternalAttachEntityDescriptor(entry.EntityDescriptor, false /*failIfDuplicated*/);
                 AtomMaterializerLog.MergeEntityDescriptorInfo(descriptor, entry.EntityDescriptor, mergeEntityDescriptorInfo, this.mergeOption);
 
+                foreach (var property in entry.ExpandablePropertyNavigationLinks)
+                {
+                    var p = entry.EntityDescriptor.Entity.GetType().GetProperty(property.Key.Name);
+                    object pValue =  p.GetValue(entry.EntityDescriptor.Entity, null);
+
+                    var de = entry.EntityDescriptor.GetComplexTypeDescriptor(property.Key.Name);
+
+                    this.entityTracker.InternalAddComplexTypeDescriptor(pValue, de);
+                }
+
                 if (mergeEntityDescriptorInfo)
                 {
                     // In AtomMaterializer.TryResolveFromContext, we set AtomEntry.ShouldUpdateFromPayload to true
