@@ -64,8 +64,7 @@ namespace Microsoft.Test.OData.Services.ODataWCFService
 
         public T GetEntity(Func<T, bool> func)
         {
-            // TODO: GitHub Issue#424
-            T entity = this.Where(func).FirstOrDefault();
+            T entity = this.Where(func).SingleOrDefault();
             DeletionContext.Current.BindAction(entity, () => this.Remove(entity));
 
             return entity;

@@ -1,13 +1,21 @@
 ﻿Param
 (
     [String]
-    $Config = "Debug"
+    $Config = "Debug",
+    
+    [String]
+    $TestType = "Private",
 )
 
 If("Debug","Release" -notcontains $Config)
 {
     Write-Host "Usage: Performancebuild.ps1 -Config Debug|Release" -ForegroundColor Red
     exit
+}
+
+If($TestType -eq 'Official')
+{
+    Write-Host "The Official test is designed for TeamCity run, and if you want to run locally, please make sure you have restored the ODataLib nuget packages manually before build." -ForegroundColor Yellow
 }
 
 $ProgramFilesX86 = [Environment]::GetFolderPath("ProgramFilesX86")
@@ -26,11 +34,12 @@ $PerfAnalysisPath = $Item.FullName
 $Item = Get-ChildItem -Filter xunit.console.exe -Recurse -path $PackagesPath
 $XunitConsoleRunnerPath = $Item.FullName
 
-Function RunBuild ($sln, $type, $conf)
+Function RunBuild ($sln, $conf, $type, $dllversion)
 {
     Write-Host "*** Building $sln ***"
     $slnpath = $EnlistmentRoot + "\sln\$sln"
     & $Msbuild $slnpath /t:rebuild /m /nr:false /fl "/p:Platform=Any CPU" /p:Configuration=$conf /p:Desktop=true /flp:LogFile=$LogDir/msbuild.log /flp:Verbosity=Normal 1>$null
+
     if($LASTEXITCODE -eq 0)
     {
         Write-Host "Build $sln SUCCESS" -ForegroundColor Green
@@ -77,6 +86,6 @@ Function ExecuteTests
     Set-Location $location
 }
 
-RunBuild 'Microsoft.OData.Performance.sln' $TestType $Config
+RunBuild 'Microsoft.OData.Performance.sln' $Config $TestType $DllVersion
 
 ExecuteTests $TestDir $PerfRunPath $PerfAnalysisPath $XunitConsoleRunnerPath

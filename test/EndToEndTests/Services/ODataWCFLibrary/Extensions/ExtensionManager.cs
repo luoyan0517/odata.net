@@ -32,8 +32,7 @@ namespace Microsoft.Test.OData.Services.ODataWCFService.Extensions
             }
             else
             {
-                var localPath = new Uri(typeof(ExtensionManager).Assembly.CodeBase).LocalPath;
-                directory = Path.GetDirectoryName(localPath);
+                directory = Path.GetDirectoryName(typeof(ExtensionManager).Assembly.Location);
             }
 
             var directoryCatalog = new DirectoryCatalog(directory);
