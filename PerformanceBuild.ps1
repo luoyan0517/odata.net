@@ -86,6 +86,6 @@ Function ExecuteTests
     Set-Location $location
 }
 
-RunBuild 'Microsoft.OData.Performance.sln' $Config $TestType $DllVersion
+RunBuild 'Microsoft.OData.Performance.sln' $Config $TestType
 
 ExecuteTests $TestDir $PerfRunPath $PerfAnalysisPath $XunitConsoleRunnerPath
