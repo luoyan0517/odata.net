@@ -246,6 +246,7 @@ namespace Microsoft.OData.JsonLight
             ProjectedPropertiesAnnotation projectedProperties = GetProjectedPropertiesAnnotation(resourceScope);
 
             this.jsonLightResourceSerializer.JsonLightValueSerializer.AssertRecursionDepthIsZero();
+            this.jsonLightOutputContext.PropertyHelper.InfoCache = this.CurrentResourceScope.PropertyInfoCache;
             this.jsonLightResourceSerializer.WriteProperties(
                 this.ResourceType,
                 resource.Properties,
@@ -596,7 +597,8 @@ namespace Microsoft.OData.JsonLight
                 this.jsonLightOutputContext.WritingResponse,
                 this.jsonLightOutputContext.MessageWriterSettings,
                 selectedProperties,
-                odataUri);
+                odataUri,
+                this.CurrentResourceSetScope.ResourcePropertyInfoCache);
         }
 
         /// <summary>
@@ -738,6 +740,8 @@ namespace Microsoft.OData.JsonLight
             /// <summary>true if the odata.deltaLink was already written, false otherwise.</summary>
             private bool deltaLinkWritten;
 
+            private PropertyInfoCache resourcePropertyInfoCache;
+
             /// <summary>
             /// Constructor to create a new resource set scope.
             /// </summary>
@@ -750,6 +754,7 @@ namespace Microsoft.OData.JsonLight
             internal JsonLightResourceSetScope(ODataResourceSet resourceSet, IEdmNavigationSource navigationSource, IEdmStructuredType resourceType, bool skipWriting, SelectedPropertiesNode selectedProperties, ODataUri odataUri)
                 : base(resourceSet, navigationSource, resourceType, skipWriting, selectedProperties, odataUri)
             {
+                this.resourcePropertyInfoCache = new PropertyInfoCache();
             }
 
             /// <summary>
@@ -783,6 +788,11 @@ namespace Microsoft.OData.JsonLight
                     this.deltaLinkWritten = value;
                 }
             }
+
+            internal PropertyInfoCache ResourcePropertyInfoCache
+            {
+                get { return this.resourcePropertyInfoCache; }
+            }
         }
 
         /// <summary>
@@ -792,6 +802,8 @@ namespace Microsoft.OData.JsonLight
         {
             /// <summary>Bit field of the JSON Light metadata properties written so far.</summary>
             private int alreadyWrittenMetadataProperties;
+
+            private PropertyInfoCache propertyInfoCache;
 
             /// <summary>
             /// Constructor to create a new resource scope.
@@ -805,9 +817,25 @@ namespace Microsoft.OData.JsonLight
             /// <param name="writerSettings">The <see cref="ODataMessageWriterSettings"/> The settings of the writer.</param>
             /// <param name="selectedProperties">The selected properties of this scope.</param>
             /// <param name="odataUri">The ODataUri info of this scope.</param>
-            internal JsonLightResourceScope(ODataResource resource, ODataResourceSerializationInfo serializationInfo, IEdmNavigationSource navigationSource, IEdmStructuredType resourceType, bool skipWriting, bool writingResponse, ODataMessageWriterSettings writerSettings, SelectedPropertiesNode selectedProperties, ODataUri odataUri)
+            internal JsonLightResourceScope(
+                ODataResource resource, 
+                ODataResourceSerializationInfo serializationInfo, 
+                IEdmNavigationSource navigationSource, 
+                IEdmStructuredType resourceType, 
+                bool skipWriting, 
+                bool writingResponse, 
+                ODataMessageWriterSettings writerSettings, 
+                SelectedPropertiesNode selectedProperties, 
+                ODataUri odataUri,
+                PropertyInfoCache propertyInfoCache)
                 : base(resource, serializationInfo, navigationSource, resourceType, skipWriting, writingResponse, writerSettings, selectedProperties, odataUri)
             {
+                this.propertyInfoCache = propertyInfoCache;
+            }
+
+            internal PropertyInfoCache PropertyInfoCache
+            {
+                get { return this.propertyInfoCache; }
             }
 
             /// <summary>

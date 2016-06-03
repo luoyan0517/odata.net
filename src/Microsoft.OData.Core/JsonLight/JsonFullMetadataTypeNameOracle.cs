@@ -67,5 +67,11 @@ namespace Microsoft.OData.JsonLight
 
             return GetTypeNameFromValue(value);
         }
+
+        internal override string GetValueTypeNameForWritingNewCache(ODataValue value, PropertyInfoInSerialization propertyInfo,
+            PropertyTypeInfoInSerialization typeReferenceFromValue, bool isOpenProperty)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

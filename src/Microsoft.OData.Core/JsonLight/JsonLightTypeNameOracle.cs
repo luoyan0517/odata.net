@@ -37,5 +37,11 @@ namespace Microsoft.OData.JsonLight
             IEdmTypeReference typeReferenceFromMetadata,
             IEdmTypeReference typeReferenceFromValue,
             bool isOpenProperty);
+
+        internal abstract string GetValueTypeNameForWritingNewCache(
+            ODataValue value,
+            PropertyInfoInSerialization propertyInfo,
+            PropertyTypeInfoInSerialization typeInfo,
+            bool isOpenProperty);
     }
 }

@@ -103,5 +103,52 @@ namespace Microsoft.OData.JsonLight
 
             return fullTypeNameFromValue != null ? fullTypeNameFromValue : GetTypeNameFromValue(value);
         }
+
+        internal override string GetValueTypeNameForWritingNewCache(ODataValue value,
+            PropertyInfoInSerialization propertyInfo, PropertyTypeInfoInSerialization typeReferenceFromValue, bool isOpenProperty)
+        {
+            string fullTypeNameFromValue = null;
+
+            SerializationTypeNameAnnotation typeNameAnnotation = value.GetAnnotation<SerializationTypeNameAnnotation>();
+            if (typeNameAnnotation != null)
+            {
+                return typeNameAnnotation.TypeName;
+            }
+
+            if (typeReferenceFromValue != null)
+            {
+                fullTypeNameFromValue = typeReferenceFromValue.FullName;
+
+                // Write type name when the type in the payload is more derived than the type from metadata.
+                if (propertyInfo.PropertyTypeReference != null && propertyInfo.FullName != fullTypeNameFromValue)
+                {
+                    return fullTypeNameFromValue;
+                }
+
+                // Do not write type name when the type is native json type.
+                if (typeReferenceFromValue.IsPrimitive && JsonSharedUtils.ValueTypeMatchesJsonType((ODataPrimitiveValue)value, typeReferenceFromValue.TypeReference.AsPrimitive()))
+                {
+                    return null;
+                }
+
+                // Note: When writing derived complexType value in a payload, we don't have the expected type.
+                // So always write @odata.type for top-level derived complex type.
+                if (propertyInfo.PropertyTypeReference == null && typeReferenceFromValue.IsComplex)
+                {
+                    if ((typeReferenceFromValue.TypeReference as IEdmComplexTypeReference).ComplexDefinition().BaseType != null)
+                    {
+                        return fullTypeNameFromValue;
+                    }
+                }
+            }
+
+            if (!isOpenProperty)
+            {
+                // Do not write type name for non-open properties since we expect the reader to have an expected type (via API or context URI) and thus not need it.
+                return null;
+            }
+
+            return fullTypeNameFromValue != null ? fullTypeNameFromValue : GetTypeNameFromValue(value);
+        }
     }
 }

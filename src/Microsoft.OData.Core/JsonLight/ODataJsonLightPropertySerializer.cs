@@ -28,6 +28,8 @@ namespace Microsoft.OData.JsonLight
         /// </summary>
         private readonly ODataJsonLightValueSerializer jsonLightValueSerializer;
 
+        private PropertyInfoInSerialization propertyInfo;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -139,7 +141,7 @@ namespace Microsoft.OData.JsonLight
             else
             {
                 isOpenProperty = (!this.WritingResponse && owningType == null) // Treat property as dynamic property when writing request and owning type is null
-                || (owningType != null && owningType.IsOpen && edmProperty == null);
+                || this.propertyInfo.IsOpenProperty;
             }
 
             if (isOpenProperty)
@@ -172,6 +174,16 @@ namespace Microsoft.OData.JsonLight
             WriterValidationUtils.ValidatePropertyNotNull(property);
 
             string propertyName = property.Name;
+
+            if (isTopLevel)
+            {
+                this.propertyInfo = new PropertyInfoInSerialization(propertyName, owningType);
+            }
+            else 
+            {
+                this.propertyInfo = this.JsonLightOutputContext.PropertyHelper.GetCurrentProperty(propertyName, owningType);
+            }
+
             if (projectedProperties.ShouldSkipProperty(propertyName))
             {
                 return;
@@ -179,19 +191,22 @@ namespace Microsoft.OData.JsonLight
 
             WriterValidationUtils.ValidatePropertyName(propertyName);
             duplicatePropertyNamesChecker.CheckForDuplicatePropertyNames(property);
-            IEdmProperty edmProperty = this.JsonLightOutputContext.MessageWriterSettings.Validator.
-                                       ValidatePropertyDefined(propertyName, owningType);
+            //IEdmProperty edmProperty = WriterValidationUtils.ValidatePropertyDefined(
+            //    propertyName,
+            //    owningType,
+            //    this.JsonLightOutputContext.MessageWriterSettings.ThrowOnUndeclaredProperty);
 
-            string wirePropertyName = isTopLevel ? JsonLightConstants.ODataValuePropertyName : propertyName;
-            bool isUndeclaredProperty = edmProperty == null;
-            IEdmTypeReference propertyTypeReference = isUndeclaredProperty ? null : edmProperty.Type;
-            WriteInstanceAnnotation(property, isTopLevel, isUndeclaredProperty);
+            WriteInstanceAnnotation(property, isTopLevel, propertyInfo.IsUndeclaredProperty);
+
+            IEdmTypeReference propertyTypeReference = propertyInfo.PropertyTypeReference;
+
             ODataValue value = property.ODataValue;
 
             // handle ODataUntypedValue
-            ODataUntypedValue untypedValue = property.Value as ODataUntypedValue;
+            ODataUntypedValue untypedValue = value as ODataUntypedValue;
             if (untypedValue != null)
             {
+                string wirePropertyName = GetWirePropertyName(isTopLevel, propertyName);
                 WriteUntypedValue(owningType, propertyName, wirePropertyName, untypedValue);
                 return;
             }
@@ -217,7 +232,7 @@ namespace Microsoft.OData.JsonLight
                 return;
             }
 
-            bool isOpenPropertyType = this.IsOpenProperty(property, owningType, edmProperty);
+            bool isOpenPropertyType = this.IsOpenProperty(property, owningType, propertyInfo.EdmProperty);
 
             ODataPrimitiveValue primitiveValue = value as ODataPrimitiveValue;
             if (primitiveValue != null)
@@ -421,14 +436,29 @@ namespace Microsoft.OData.JsonLight
         {
             string wirePropertyName = GetWirePropertyName(isTopLevel, property.Name);
 
-            IEdmTypeReference typeFromValue = TypeNameOracle.ResolveAndValidateTypeForCollectionValue(this.Model, propertyTypeReference, collectionValue, isOpenPropertyType, this.WriterValidator);
-            string typeNameToWrite = this.JsonLightOutputContext.TypeNameOracle.GetValueTypeNameForWriting(collectionValue, propertyTypeReference, typeFromValue, isOpenPropertyType);
+            PropertyTypeInfoInSerialization typeInfo;
+            if (this.propertyInfo.ValueTypeInfo == null || this.propertyInfo.ValueTypeInfo.TypeName != collectionValue.TypeName)
+            {
+                IEdmTypeReference typeFromValue = TypeNameOracle.ResolveAndValidateTypeForCollectionValue(this.Model,
+                    propertyTypeReference, collectionValue, isOpenPropertyType, this.WriterValidator);
+                typeInfo = new PropertyTypeInfoInSerialization(collectionValue.TypeName, typeFromValue);
+                this.propertyInfo.ValueTypeInfo = typeInfo;
+                this.propertyInfo.TypeNameToWrite =
+                    this.JsonLightOutputContext.TypeNameOracle.GetValueTypeNameForWritingNewCache(collectionValue,
+                        this.propertyInfo, typeInfo, isOpenPropertyType);
+            }
+            else
+            {
+                typeInfo = this.propertyInfo.ValueTypeInfo;
+            }
+
+            string typeNameToWrite = this.propertyInfo.TypeNameToWrite;
 
             this.WritePropertyTypeName(wirePropertyName, typeNameToWrite, isTopLevel);
             this.JsonWriter.WriteName(wirePropertyName);
 
             // passing false for 'isTopLevel' because the outer wrapping object has already been written.
-            this.JsonLightValueSerializer.WriteCollectionValue(collectionValue, propertyTypeReference, typeFromValue, isTopLevel, false /*isInUri*/, isOpenPropertyType);
+            this.JsonLightValueSerializer.WriteCollectionValue(collectionValue, propertyTypeReference, typeInfo.TypeReference, isTopLevel, false /*isInUri*/, isOpenPropertyType);
             return;
         }
 
@@ -449,12 +479,26 @@ namespace Microsoft.OData.JsonLight
         {
             string wirePropertyName = GetWirePropertyName(isTopLevel, property.Name);
 
-            IEdmTypeReference typeFromValue = TypeNameOracle.ResolveAndValidateTypeForPrimitiveValue(primitiveValue);
-            string typeNameToWrite = this.JsonLightOutputContext.TypeNameOracle.GetValueTypeNameForWriting(primitiveValue, propertyTypeReference, typeFromValue, isOpenPropertyType);
+            PropertyTypeInfoInSerialization typeInfo;
+            string typeName = primitiveValue.Value.GetType().Name;
+            if (this.propertyInfo.ValueTypeInfo == null || this.propertyInfo.ValueTypeInfo.TypeName != typeName)
+            {
+                IEdmTypeReference typeFromValue = TypeNameOracle.ResolveAndValidateTypeForPrimitiveValue(primitiveValue);
+                typeInfo = new PropertyTypeInfoInSerialization(typeName, typeFromValue);
+                this.propertyInfo.ValueTypeInfo = typeInfo;
+                this.propertyInfo.TypeNameToWrite =
+                    this.JsonLightOutputContext.TypeNameOracle.GetValueTypeNameForWritingNewCache(primitiveValue, this.propertyInfo, typeInfo, isOpenPropertyType);
+            }
+            else
+            {
+                typeInfo = this.propertyInfo.ValueTypeInfo;
+            }
+
+            string typeNameToWrite = this.propertyInfo.TypeNameToWrite;
 
             this.WritePropertyTypeName(wirePropertyName, typeNameToWrite, isTopLevel);
             this.JsonWriter.WriteName(wirePropertyName);
-            this.JsonLightValueSerializer.WritePrimitiveValue(primitiveValue.Value, typeFromValue, propertyTypeReference);
+            this.JsonLightValueSerializer.WritePrimitiveValue(primitiveValue.Value, typeInfo.TypeReference, propertyTypeReference);
         }
 
         /// <summary>

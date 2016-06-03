@@ -49,6 +49,8 @@ namespace Microsoft.OData.JsonLight
         /// </summary>
         private JsonLightTypeNameOracle typeNameOracle;
 
+        private PropertyCacheHelper propertyCacheHelper;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -96,6 +98,7 @@ namespace Microsoft.OData.JsonLight
 
             Uri metadataDocumentUri = messageWriterSettings.MetadataDocumentUri;
             this.metadataLevel = JsonLightMetadataLevel.Create(messageInfo.MediaType, metadataDocumentUri, this.Model, this.WritingResponse);
+            this.propertyCacheHelper = new PropertyCacheHelper();
         }
 
         /// <summary>
@@ -167,6 +170,11 @@ namespace Microsoft.OData.JsonLight
             {
                 return metadataLevel.ContextUrlLevel;
             }
+        }
+
+        public PropertyCacheHelper PropertyHelper
+        {
+            get { return propertyCacheHelper; }
         }
 
         /// <summary>

@@ -53,6 +53,11 @@
     <Compile Include="Json\IJsonReaderFactory.cs" />
     <Compile Include="Json\IJsonWriterFactory.cs" />
     <Compile Include="PropertyAnnotationCollector.cs" />
+    <Compile Include="PropertyCacheHelper.cs" />
+    <Compile Include="PropertyInfoCache.cs" />
+    <Compile Include="PropertyInfoInSerialization.cs" />
+    <Compile Include="PropertyTypeInfoInSerialization.cs" />
+    <Compile Include="ResourceSharedInfo.cs" />
     <Compile Include="ServiceLifetime.cs" />
     <Compile Include="IContainerBuilder.cs" />
     <Compile Include="Metadata\ODataAtomErrorDeserializer.cs" />
