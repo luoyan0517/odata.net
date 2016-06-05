@@ -22,6 +22,8 @@ namespace Microsoft.OData
 
         private readonly bool isComplex;
 
+        private readonly EdmPrimitiveTypeKind primitiveTypeKind;
+
         public PropertyTypeInfoInSerialization(string typeName, IEdmTypeReference typeReference)
         {
             this.typeName = typeName;
@@ -30,6 +32,7 @@ namespace Microsoft.OData
             this.isPrimitive = typeReference.IsPrimitive();
             this.isSpatial = typeReference.IsSpatial();
             this.isComplex = typeReference.IsComplex();
+            this.primitiveTypeKind = this.IsPrimitive ? this.typeReference.AsPrimitive().PrimitiveKind() : EdmPrimitiveTypeKind.None;
         }
 
         public IEdmTypeReference TypeReference
@@ -60,6 +63,11 @@ namespace Microsoft.OData
         public string TypeName
         {
             get { return typeName; }
+        }
+
+        public EdmPrimitiveTypeKind PrimitiveTypeKind
+        {
+            get { return primitiveTypeKind; }
         }
     }
 }

@@ -126,7 +126,7 @@ namespace Microsoft.OData.JsonLight
                 }
 
                 // Do not write type name when the type is native json type.
-                if (typeReferenceFromValue.IsPrimitive && JsonSharedUtils.ValueTypeMatchesJsonType((ODataPrimitiveValue)value, typeReferenceFromValue.TypeReference.AsPrimitive()))
+                if (typeReferenceFromValue.IsPrimitive && JsonSharedUtils.ValueTypeMatchesJsonType((ODataPrimitiveValue)value, typeReferenceFromValue.PrimitiveTypeKind))
                 {
                     return null;
                 }
