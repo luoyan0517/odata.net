@@ -52,6 +52,8 @@ namespace Microsoft.OData
         /// <summary>The number of entries which have been started but not yet ended.</summary>
         private int currentResourceDepth;
 
+        private string currentResourceName;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -788,11 +790,12 @@ namespace Microsoft.OData
         /// <returns>The validated structured type.</returns>
         protected IEdmStructuredType GetResourceType(ODataResource resource)
         {
-            if (resource.TypeName == null && this.CurrentScope.ResourceType != null)
+            if ((resource.TypeName == null || this.currentResourceName == resource.TypeName) && this.CurrentScope.ResourceType != null)
             {
                 return this.CurrentScope.ResourceType;
             }
 
+            this.currentResourceName = resource.TypeName;
             // TODO: Clean up handling of expected types/sets during writing
             return (IEdmStructuredType)TypeNameOracle.ResolveAndValidateTypeName(this.outputContext.Model, resource.TypeName, EdmTypeKind.Complex | EdmTypeKind.Entity, this.WriterValidator);
         }
