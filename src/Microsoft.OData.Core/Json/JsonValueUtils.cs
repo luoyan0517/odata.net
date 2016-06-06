@@ -49,7 +49,7 @@ namespace Microsoft.OData.Json
         // <summary>
         // Map of special characters to strings.
         // </summary>
-       // private static readonly string[] SpecialCharToEscapedStringMap = CreateSpecialCharToEscapedStringMap();
+        public static readonly string[] SpecialCharToEscapedStringMap = CreateSpecialCharToEscapedStringMap();
 
         /// <summary>
         /// Initialize static properties
@@ -350,7 +350,37 @@ namespace Microsoft.OData.Json
 
             writer.Write(JsonConstants.QuoteCharacter);
 
-            writer.Write(inputString);
+            int startIndex = 0;
+            int inputStringLength = inputString.Length;
+            int subStrLength;
+            for (int currentIndex = 0; currentIndex < inputStringLength; currentIndex++)
+            {
+                char c = inputString[currentIndex];
+
+                // Append the unhandled characters (that do not require special treament)
+                // to the string builder when special characters are detected.
+                if (SpecialCharToEscapedStringMap[c] == null)
+                {
+                    continue;
+                }
+
+                // Flush out the unescaped characters we've built so far.
+                subStrLength = currentIndex - startIndex;
+                if (subStrLength > 0)
+                {
+                    writer.Write(inputString.Substring(startIndex, subStrLength));
+                }
+
+                writer.Write(SpecialCharToEscapedStringMap[c]);
+                startIndex = currentIndex + 1;
+            }
+
+            subStrLength = inputStringLength - startIndex;
+            if (subStrLength > 0)
+            {
+                writer.Write(inputString.Substring(startIndex, subStrLength));
+            }
+          //  writer.Write(inputString);
 
             writer.Write(JsonConstants.QuoteCharacter);
         }
@@ -389,6 +419,37 @@ namespace Microsoft.OData.Json
             // Ticks in .NET are in 100-nanoseconds and start at 1.1.0001.
             // Ticks in the JSON date time format are in milliseconds and start at 1.1.1970.
             return (ticks - JsonDateTimeMinTimeTicks) / 10000;
+        }
+
+        /// <summary>
+        /// Creates the special character to escaped string map.
+        /// </summary>
+        /// <returns>The map of special characters to the corresponding escaped strings.</returns>
+        private static string[] CreateSpecialCharToEscapedStringMap()
+        {
+            string[] specialCharToEscapedStringMap = new string[char.MaxValue + 1];
+            for (int c = char.MinValue; c <= char.MaxValue; ++c)
+            {
+                if ((c < ' ') || (c > 0x7F))
+                {
+                    // We only need to populate for characters < ' ' and > 0x7F.
+                    specialCharToEscapedStringMap[c] = string.Format(CultureInfo.InvariantCulture, "\\u{0:x4}", c);
+                }
+                else
+                {
+                    specialCharToEscapedStringMap[c] = null;
+                }
+            }
+
+            specialCharToEscapedStringMap['\r'] = "\\r";
+            specialCharToEscapedStringMap['\t'] = "\\t";
+            specialCharToEscapedStringMap['\"'] = "\\\"";
+            specialCharToEscapedStringMap['\\'] = "\\\\";
+            specialCharToEscapedStringMap['\n'] = "\\n";
+            specialCharToEscapedStringMap['\b'] = "\\b";
+            specialCharToEscapedStringMap['\f'] = "\\f";
+
+            return specialCharToEscapedStringMap;
         }
     }
 }

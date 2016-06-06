@@ -245,6 +245,8 @@ namespace Microsoft.OData.JsonLight
             // Write the properties
             ProjectedPropertiesAnnotation projectedProperties = GetProjectedPropertiesAnnotation(resourceScope);
 
+            this.jsonLightOutputContext.PropertyHelper.CurrentResourceScopeLevel = this.ScopeLevel;
+
             this.jsonLightResourceSerializer.JsonLightValueSerializer.AssertRecursionDepthIsZero();
             this.jsonLightResourceSerializer.WriteProperties(
                 this.ResourceType,
@@ -390,6 +392,8 @@ namespace Microsoft.OData.JsonLight
                     }
                 }
             }
+
+            this.jsonLightOutputContext.PropertyHelper.ResourceSetScopeLevel = this.ScopeLevel;
         }
 
         /// <summary>
@@ -447,6 +451,8 @@ namespace Microsoft.OData.JsonLight
                     this.WriteResourceSetNextLink(resourceSet, propertyName);
                 }
             }
+
+            this.jsonLightOutputContext.PropertyHelper.LeaveResourceSetScope();
         }
 
         /// <summary>

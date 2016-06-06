@@ -28,11 +28,14 @@ namespace Microsoft.OData
         {
             this.typeName = typeName;
             this.typeReference = typeReference;
-            this.fullName = typeReference.FullName();
-            this.isPrimitive = typeReference.IsPrimitive();
-            this.isSpatial = typeReference.IsSpatial();
-            this.isComplex = typeReference.IsComplex();
-            this.primitiveTypeKind = this.IsPrimitive ? this.typeReference.AsPrimitive().PrimitiveKind() : EdmPrimitiveTypeKind.None;
+            if (this.typeReference != null)
+            {
+                this.fullName = typeReference.FullName();
+                this.isPrimitive = typeReference.IsPrimitive();
+                this.isSpatial = typeReference.IsSpatial();
+                this.isComplex = typeReference.IsComplex();
+                this.primitiveTypeKind = this.IsPrimitive ? this.typeReference.AsPrimitive().PrimitiveKind() : EdmPrimitiveTypeKind.None;
+            }
         }
 
         public IEdmTypeReference TypeReference

@@ -13,15 +13,46 @@ namespace Microsoft.OData
 
         private PropertyInfoInSerialization currentProperty;
 
+        private int previousResourceSetScopeLevel;
+
+        private int resourceSetScopeLevel;
+
+        private int currentResourceScopeLevel;
+
+
         public PropertyInfoCache InfoCache
         {
             get { return propertyInfoCache; }
             set { propertyInfoCache = value; }
         }
 
+        public int ResourceSetScopeLevel
+        {
+            get { return this.resourceSetScopeLevel; }
+            set
+            {
+                previousResourceSetScopeLevel = this.resourceSetScopeLevel;
+                this.resourceSetScopeLevel = value;
+            }
+        }
+
+        public int CurrentResourceScopeLevel
+        {
+            set { currentResourceScopeLevel = value; }
+        }
+
         public PropertyInfoInSerialization GetCurrentProperty(string name, IEdmStructuredType owningType)
         {
-            this.currentProperty = this.propertyInfoCache.GetPropertyInfo(name, owningType);
+            string identicalName;
+            if (this.currentResourceScopeLevel == this.resourceSetScopeLevel + 1)
+            {
+                identicalName = name;
+            }
+            else
+            {
+                identicalName = name + (this.currentResourceScopeLevel - this.resourceSetScopeLevel);
+            }
+            this.currentProperty = this.propertyInfoCache.GetPropertyInfo(identicalName, owningType);
             return this.currentProperty;
         }
 
@@ -30,5 +61,9 @@ namespace Microsoft.OData
             return this.currentProperty;
         }
 
+        public void LeaveResourceSetScope()
+        {
+            this.resourceSetScopeLevel = previousResourceSetScopeLevel;
+        }
     }
 }

@@ -120,6 +120,7 @@ namespace Microsoft.OData.JsonLight
             this.textWriter = textWriter;
             this.jsonWriter = CreateJsonWriter(messageInfo.Container, textWriter, messageWriterSettings.EnableIndentation, true /*isIeee754Compatible*/);
             this.metadataLevel = new JsonMinimalMetadataLevel();
+            this.propertyCacheHelper = new PropertyCacheHelper();
         }
 
         /// <summary>

@@ -68,10 +68,27 @@ namespace Microsoft.OData.JsonLight
             return GetTypeNameFromValue(value);
         }
 
-        internal override string GetValueTypeNameForWritingNewCache(ODataValue value, PropertyInfoInSerialization propertyInfo,
-            PropertyTypeInfoInSerialization typeReferenceFromValue, bool isOpenProperty)
+        internal override string GetValueTypeNameForWritingNewCache(ODataValue value,
+            PropertyInfoInSerialization propertyInfo, PropertyTypeInfoInSerialization typeReferenceFromValue, bool isOpenProperty)
         {
-            throw new System.NotImplementedException();
+            string fullTypeNameFromValue = null;
+
+            SerializationTypeNameAnnotation typeNameAnnotation = value.GetAnnotation<SerializationTypeNameAnnotation>();
+            if (typeNameAnnotation != null)
+            {
+                return typeNameAnnotation.TypeName;
+            }
+
+            if (typeReferenceFromValue != null)
+            {
+                // Do not write type name when the type is native json type.
+                if (typeReferenceFromValue.IsPrimitive && JsonSharedUtils.ValueTypeMatchesJsonType((ODataPrimitiveValue)value, typeReferenceFromValue.PrimitiveTypeKind))
+                {
+                    return null;
+                }
+            }
+
+            return fullTypeNameFromValue != null ? fullTypeNameFromValue : GetTypeNameFromValue(value);
         }
     }
 }

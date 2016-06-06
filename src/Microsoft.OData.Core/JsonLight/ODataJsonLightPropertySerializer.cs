@@ -175,7 +175,7 @@ namespace Microsoft.OData.JsonLight
 
             string propertyName = property.Name;
 
-            if (isTopLevel)
+            if (isTopLevel || this.JsonLightOutputContext.PropertyHelper.ResourceSetScopeLevel <=0 )
             {
                 this.propertyInfo = new PropertyInfoInSerialization(propertyName, owningType);
             }
@@ -221,7 +221,7 @@ namespace Microsoft.OData.JsonLight
 
                 Debug.Assert(owningType == null || owningType.IsODataEntityTypeKind(), "The metadata should not allow named stream properties to be defined on a non-entity type.");
                 Debug.Assert(!isTopLevel, "Stream properties are not allowed at the top level.");
-                WriterValidationUtils.ValidateStreamReferenceProperty(property, edmProperty, this.WritingResponse);
+                WriterValidationUtils.ValidateStreamReferenceProperty(property, propertyInfo.EdmProperty, this.WritingResponse);
                 this.WriteStreamReferenceProperty(propertyName, streamReferenceValue);
                 return;
             }

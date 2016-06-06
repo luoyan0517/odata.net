@@ -183,6 +183,11 @@ namespace Microsoft.OData
             }
         }
 
+        protected int ScopeLevel
+        {
+            get { return this.scopes.Count; }
+        }
+
         /// <summary>
         /// Returns the immediate parent link which is being expanded, or null if no such link exists
         /// </summary>
