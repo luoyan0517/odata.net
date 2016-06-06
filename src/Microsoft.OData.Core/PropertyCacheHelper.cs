@@ -11,23 +11,22 @@ namespace Microsoft.OData
     {
         private PropertyInfoCache propertyInfoCache;
 
-        private PropertyInfoCache previousPropertyInfoCache;
-
         private PropertySerializationInfo currentProperty;
-
-        private int previousResourceSetScopeLevel;
 
         private int resourceSetScopeLevel;
 
         private int currentResourceScopeLevel;
 
+        private Stack<PropertyInfoCache> cacheStack = new Stack<PropertyInfoCache>();
+
+        private Stack<int> scopeLevelStack = new Stack<int>();
 
         public PropertyInfoCache InfoCache
         {
             get { return propertyInfoCache; }
             set
             {
-                previousPropertyInfoCache = this.propertyInfoCache;
+                this.cacheStack.Push(this.propertyInfoCache);
                 propertyInfoCache = value;
             }
         }
@@ -37,7 +36,7 @@ namespace Microsoft.OData
             get { return this.resourceSetScopeLevel; }
             set
             {
-                previousResourceSetScopeLevel = this.resourceSetScopeLevel;
+                this.scopeLevelStack.Push(this.resourceSetScopeLevel);
                 this.resourceSetScopeLevel = value;
             }
         }
@@ -69,8 +68,8 @@ namespace Microsoft.OData
 
         public void LeaveResourceSetScope()
         {
-            this.resourceSetScopeLevel = previousResourceSetScopeLevel;
-            this.propertyInfoCache = this.previousPropertyInfoCache;
+            this.resourceSetScopeLevel = this.scopeLevelStack.Pop();
+            this.propertyInfoCache = this.cacheStack.Pop();
         }
     }
 }
