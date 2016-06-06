@@ -175,7 +175,7 @@ namespace Microsoft.OData.JsonLight
 
             string propertyName = property.Name;
 
-            if (isTopLevel || this.JsonLightOutputContext.PropertyHelper.ResourceSetScopeLevel <=0 )
+            if (this.JsonLightOutputContext.PropertyHelper.ResourceSetScopeLevel <=0 )
             {
                 this.propertyInfo = new PropertySerializationInfo(propertyName, owningType);
             }

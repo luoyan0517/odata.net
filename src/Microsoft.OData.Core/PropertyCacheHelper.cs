@@ -11,6 +11,8 @@ namespace Microsoft.OData
     {
         private PropertyInfoCache propertyInfoCache;
 
+        private PropertyInfoCache previousPropertyInfoCache;
+
         private PropertySerializationInfo currentProperty;
 
         private int previousResourceSetScopeLevel;
@@ -23,7 +25,11 @@ namespace Microsoft.OData
         public PropertyInfoCache InfoCache
         {
             get { return propertyInfoCache; }
-            set { propertyInfoCache = value; }
+            set
+            {
+                previousPropertyInfoCache = this.propertyInfoCache;
+                propertyInfoCache = value;
+            }
         }
 
         public int ResourceSetScopeLevel
@@ -64,6 +70,7 @@ namespace Microsoft.OData
         public void LeaveResourceSetScope()
         {
             this.resourceSetScopeLevel = previousResourceSetScopeLevel;
+            this.propertyInfoCache = this.previousPropertyInfoCache;
         }
     }
 }
