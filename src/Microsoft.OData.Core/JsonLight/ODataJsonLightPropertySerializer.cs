@@ -28,7 +28,7 @@ namespace Microsoft.OData.JsonLight
         /// </summary>
         private readonly ODataJsonLightValueSerializer jsonLightValueSerializer;
 
-        private PropertyInfoInSerialization propertyInfo;
+        private PropertySerializationInfo propertyInfo;
 
         /// <summary>
         /// Constructor.
@@ -141,7 +141,7 @@ namespace Microsoft.OData.JsonLight
             else
             {
                 isOpenProperty = (!this.WritingResponse && owningType == null) // Treat property as dynamic property when writing request and owning type is null
-                || this.propertyInfo.IsOpenProperty;
+                || this.propertyInfo.IsOpenPropertyInModel;
             }
 
             if (isOpenProperty)
@@ -177,7 +177,7 @@ namespace Microsoft.OData.JsonLight
 
             if (isTopLevel || this.JsonLightOutputContext.PropertyHelper.ResourceSetScopeLevel <=0 )
             {
-                this.propertyInfo = new PropertyInfoInSerialization(propertyName, owningType);
+                this.propertyInfo = new PropertySerializationInfo(propertyName, owningType);
             }
             else 
             {
@@ -436,12 +436,12 @@ namespace Microsoft.OData.JsonLight
         {
             string wirePropertyName = GetWirePropertyName(isTopLevel, property.Name);
 
-            PropertyTypeInfoInSerialization typeInfo;
+            PropertyValueTypeInfo typeInfo;
             if (this.propertyInfo.ValueTypeInfo == null || this.propertyInfo.ValueTypeInfo.TypeName != collectionValue.TypeName)
             {
                 IEdmTypeReference typeFromValue = TypeNameOracle.ResolveAndValidateTypeForCollectionValue(this.Model,
                     propertyTypeReference, collectionValue, isOpenPropertyType, this.WriterValidator);
-                typeInfo = new PropertyTypeInfoInSerialization(collectionValue.TypeName, typeFromValue);
+                typeInfo = new PropertyValueTypeInfo(collectionValue.TypeName, typeFromValue);
                 this.propertyInfo.ValueTypeInfo = typeInfo;
                 this.propertyInfo.TypeNameToWrite =
                     this.JsonLightOutputContext.TypeNameOracle.GetValueTypeNameForWritingNewCache(collectionValue,
@@ -479,12 +479,12 @@ namespace Microsoft.OData.JsonLight
         {
             string wirePropertyName = GetWirePropertyName(isTopLevel, property.Name);
 
-            PropertyTypeInfoInSerialization typeInfo;
+            PropertyValueTypeInfo typeInfo;
             string typeName = primitiveValue.Value.GetType().Name;
             if (this.propertyInfo.ValueTypeInfo == null || this.propertyInfo.ValueTypeInfo.TypeName != typeName)
             {
                 IEdmTypeReference typeFromValue = TypeNameOracle.ResolveAndValidateTypeForPrimitiveValue(primitiveValue);
-                typeInfo = new PropertyTypeInfoInSerialization(typeName, typeFromValue);
+                typeInfo = new PropertyValueTypeInfo(typeName, typeFromValue);
                 this.propertyInfo.ValueTypeInfo = typeInfo;
                 this.propertyInfo.TypeNameToWrite =
                     this.JsonLightOutputContext.TypeNameOracle.GetValueTypeNameForWritingNewCache(primitiveValue, this.propertyInfo, typeInfo, isOpenPropertyType);

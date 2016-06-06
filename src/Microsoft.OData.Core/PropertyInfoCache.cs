@@ -10,23 +10,23 @@ namespace Microsoft.OData
 {
     internal class PropertyInfoCache
     {
-        private Dictionary<string, PropertyInfoInSerialization> propertyInfoDictionary = new Dictionary<string, PropertyInfoInSerialization>();
+        private Dictionary<string, PropertySerializationInfo> propertyInfoDictionary = new Dictionary<string, PropertySerializationInfo>();
 
-        private Dictionary<string, PropertyTypeInfoInSerialization> typeInfoDictionary =
-            new Dictionary<string, PropertyTypeInfoInSerialization>();
+        private Dictionary<string, PropertyValueTypeInfo> typeInfoDictionary =
+            new Dictionary<string, PropertyValueTypeInfo>();
 
-        public PropertyInfoInSerialization GetPropertyInfo(string name, IEdmStructuredType owningType)
+        public PropertySerializationInfo GetPropertyInfo(string name, IEdmStructuredType owningType)
         {
-            PropertyInfoInSerialization propertyInfo;
+            PropertySerializationInfo propertyInfo;
             if (!propertyInfoDictionary.TryGetValue(name, out propertyInfo))
             {
-                propertyInfo = new PropertyInfoInSerialization(name, owningType);
+                propertyInfo = new PropertySerializationInfo(name, owningType);
                 propertyInfoDictionary[name] = propertyInfo;
             }
             return propertyInfo;
         }
 
-        public bool TryGetTypeInfo(string typeName, out PropertyTypeInfoInSerialization typeInfo)
+        public bool TryGetTypeInfo(string typeName, out PropertyValueTypeInfo typeInfo)
         {
             if (typeInfoDictionary.TryGetValue(typeName, out typeInfo))
             {
@@ -38,9 +38,9 @@ namespace Microsoft.OData
             }
         }
 
-        public PropertyTypeInfoInSerialization SetTypeInfo(string typeName, IEdmTypeReference typeReference)
+        public PropertyValueTypeInfo SetTypeInfo(string typeName, IEdmTypeReference typeReference)
         {
-            PropertyTypeInfoInSerialization typeInfo = new PropertyTypeInfoInSerialization(typeName, typeReference);
+            PropertyValueTypeInfo typeInfo = new PropertyValueTypeInfo(typeName, typeReference);
             typeInfoDictionary[typeName] = typeInfo;
             return typeInfo;
         }

@@ -105,7 +105,7 @@ namespace Microsoft.OData.JsonLight
         }
 
         internal override string GetValueTypeNameForWritingNewCache(ODataValue value,
-            PropertyInfoInSerialization propertyInfo, PropertyTypeInfoInSerialization typeReferenceFromValue, bool isOpenProperty)
+            PropertySerializationInfo propertyInfo, PropertyValueTypeInfo typeReferenceFromValue, bool isOpenProperty)
         {
             string fullTypeNameFromValue = null;
 

@@ -40,8 +40,8 @@ namespace Microsoft.OData.JsonLight
 
         internal abstract string GetValueTypeNameForWritingNewCache(
             ODataValue value,
-            PropertyInfoInSerialization propertyInfo,
-            PropertyTypeInfoInSerialization typeInfo,
+            PropertySerializationInfo propertyInfo,
+            PropertyValueTypeInfo typeInfo,
             bool isOpenProperty);
     }
 }

@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.OData.Edm;
+﻿using Microsoft.OData.Edm;
 
 namespace Microsoft.OData
 {
-    internal class PropertyTypeInfoInSerialization
+    internal class PropertyValueTypeInfo
     {
         private string typeName;
 
         private readonly IEdmTypeReference typeReference;
 
-        // FullName()
         private readonly string fullName;
 
         private readonly bool isPrimitive;
@@ -24,7 +18,7 @@ namespace Microsoft.OData
 
         private readonly EdmPrimitiveTypeKind primitiveTypeKind;
 
-        public PropertyTypeInfoInSerialization(string typeName, IEdmTypeReference typeReference)
+        public PropertyValueTypeInfo(string typeName, IEdmTypeReference typeReference)
         {
             this.typeName = typeName;
             this.typeReference = typeReference;

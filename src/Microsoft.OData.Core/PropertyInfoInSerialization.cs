@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.OData.Edm;
+﻿using Microsoft.OData.Edm;
 
 namespace Microsoft.OData
 {
-    internal class PropertyInfoInSerialization
+    internal class PropertySerializationInfo
     {
         private readonly string propertyName;
 
@@ -16,30 +10,25 @@ namespace Microsoft.OData
 
         private readonly IEdmTypeReference propertyTypeReference;
 
-        // FindProperty()
         private readonly IEdmProperty edmProperty;
 
-        // FullName()
         private readonly string fullName;
-
-      //  private readonly string escapedName;
 
         private readonly bool isUndeclaredProperty;
 
-        private bool isOpenProperty;
+        private bool isOpenPropertyInModel;
 
-        private PropertyTypeInfoInSerialization valueTypeInfo;
+        private PropertyValueTypeInfo valueTypeInfo;
 
         private string typeNameToWrite;
 
-        public PropertyInfoInSerialization(string name, IEdmStructuredType owningType)
+        public PropertySerializationInfo(string name, IEdmStructuredType owningType)
         {
             this.propertyName = name;
             this.owningType = owningType;
-         //   this.escapedName = EscapeString(propertyName);
             this.edmProperty = owningType == null? null : owningType.FindProperty(propertyName);
             this.isUndeclaredProperty = edmProperty == null;
-            this.isOpenProperty = (this.owningType != null && this.owningType.IsOpen && this.isUndeclaredProperty);
+            this.isOpenPropertyInModel = (this.owningType != null && this.owningType.IsOpen && this.isUndeclaredProperty);
             this.propertyTypeReference = this.isUndeclaredProperty ? null : edmProperty.Type;
             this.fullName = this.propertyTypeReference ==null? null : this.propertyTypeReference.Definition.AsActualType().FullTypeName();
         }
@@ -49,14 +38,9 @@ namespace Microsoft.OData
             get { return this.edmProperty; }
         }
 
-        //public string EscapedName
-        //{
-        //    get { return escapedName; }
-        //}
-
-        public bool IsOpenProperty
+        public bool IsOpenPropertyInModel
         {
-            get { return isOpenProperty; }
+            get { return isOpenPropertyInModel; }
         }
 
         public bool IsUndeclaredProperty
@@ -84,7 +68,7 @@ namespace Microsoft.OData
             get { return fullName; }
         }
 
-        public PropertyTypeInfoInSerialization ValueTypeInfo
+        public PropertyValueTypeInfo ValueTypeInfo
         {
             get { return valueTypeInfo; }
             set { valueTypeInfo = value; }
@@ -95,43 +79,5 @@ namespace Microsoft.OData
             get { return typeNameToWrite; }
             set { typeNameToWrite = value; }
         }
-
-        //private static string EscapeString(string inputString)
-        //{
-        //    StringBuilder outputString = new StringBuilder();
-
-        //    int startIndex = 0;
-        //    int inputStringLength = inputString.Length;
-        //    int subStrLength;
-        //    for (int currentIndex = 0; currentIndex < inputStringLength; currentIndex++)
-        //    {
-        //        char c = inputString[currentIndex];
-
-        //        // Append the unhandled characters (that do not require special treatment)
-        //        // to the string builder when special characters are detected.
-        //        if (SpecialCharToEscapedStringMap[c] == null)
-        //        {
-        //            continue;
-        //        }
-
-        //        // Flush out the unescaped characters we've built so far.
-        //        subStrLength = currentIndex - startIndex;
-        //        if (subStrLength > 0)
-        //        {
-        //            outputString.Append(inputString.Substring(startIndex, subStrLength));
-        //        }
-
-        //        outputString.Append(SpecialCharToEscapedStringMap[c]);
-        //        startIndex = currentIndex + 1;
-        //    }
-
-        //    subStrLength = inputStringLength - startIndex;
-        //    if (subStrLength > 0)
-        //    {
-        //        outputString.Append(inputString.Substring(startIndex, subStrLength));
-        //    }
-
-        //    return outputString.ToString();
-        //}
     }
 }

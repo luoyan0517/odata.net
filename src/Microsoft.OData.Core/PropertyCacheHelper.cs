@@ -11,7 +11,7 @@ namespace Microsoft.OData
     {
         private PropertyInfoCache propertyInfoCache;
 
-        private PropertyInfoInSerialization currentProperty;
+        private PropertySerializationInfo currentProperty;
 
         private int previousResourceSetScopeLevel;
 
@@ -41,7 +41,7 @@ namespace Microsoft.OData
             set { currentResourceScopeLevel = value; }
         }
 
-        public PropertyInfoInSerialization GetCurrentProperty(string name, IEdmStructuredType owningType)
+        public PropertySerializationInfo GetCurrentProperty(string name, IEdmStructuredType owningType)
         {
             string identicalName;
             if (this.currentResourceScopeLevel == this.resourceSetScopeLevel + 1)
@@ -56,7 +56,7 @@ namespace Microsoft.OData
             return this.currentProperty;
         }
 
-        public PropertyInfoInSerialization GetCurrentProperty()
+        public PropertySerializationInfo GetCurrentProperty()
         {
             return this.currentProperty;
         }
