@@ -246,7 +246,6 @@ namespace Microsoft.OData.JsonLight
             ProjectedPropertiesAnnotation projectedProperties = GetProjectedPropertiesAnnotation(resourceScope);
 
             this.jsonLightResourceSerializer.JsonLightValueSerializer.AssertRecursionDepthIsZero();
-            this.jsonLightOutputContext.PropertyHelper.InfoCache = this.CurrentResourceScope.PropertyInfoCache;
             this.jsonLightResourceSerializer.WriteProperties(
                 this.ResourceType,
                 resource.Properties,
@@ -573,7 +572,9 @@ namespace Microsoft.OData.JsonLight
         /// <returns>The newly create scope.</returns>
         protected override ResourceSetScope CreateResourceSetScope(ODataResourceSet resourceSet, IEdmNavigationSource navigationSource, IEdmStructuredType resourceType, bool skipWriting, SelectedPropertiesNode selectedProperties, ODataUri odataUri)
         {
-            return new JsonLightResourceSetScope(resourceSet, navigationSource, resourceType, skipWriting, selectedProperties, odataUri);
+            JsonLightResourceSetScope resourceSetScope = new JsonLightResourceSetScope(resourceSet, navigationSource, resourceType, skipWriting, selectedProperties, odataUri);
+            this.jsonLightOutputContext.PropertyHelper.InfoCache = resourceSetScope.ResourcePropertyInfoCache;
+            return resourceSetScope;
         }
 
         /// <summary>
@@ -597,8 +598,7 @@ namespace Microsoft.OData.JsonLight
                 this.jsonLightOutputContext.WritingResponse,
                 this.jsonLightOutputContext.MessageWriterSettings,
                 selectedProperties,
-                odataUri,
-                this.CurrentResourceSetScope.ResourcePropertyInfoCache);
+                odataUri);
         }
 
         /// <summary>
@@ -803,8 +803,6 @@ namespace Microsoft.OData.JsonLight
             /// <summary>Bit field of the JSON Light metadata properties written so far.</summary>
             private int alreadyWrittenMetadataProperties;
 
-            private PropertyInfoCache propertyInfoCache;
-
             /// <summary>
             /// Constructor to create a new resource scope.
             /// </summary>
@@ -826,16 +824,9 @@ namespace Microsoft.OData.JsonLight
                 bool writingResponse, 
                 ODataMessageWriterSettings writerSettings, 
                 SelectedPropertiesNode selectedProperties, 
-                ODataUri odataUri,
-                PropertyInfoCache propertyInfoCache)
+                ODataUri odataUri)
                 : base(resource, serializationInfo, navigationSource, resourceType, skipWriting, writingResponse, writerSettings, selectedProperties, odataUri)
             {
-                this.propertyInfoCache = propertyInfoCache;
-            }
-
-            internal PropertyInfoCache PropertyInfoCache
-            {
-                get { return this.propertyInfoCache; }
             }
 
             /// <summary>
