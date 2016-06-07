@@ -99,6 +99,19 @@ namespace Microsoft.OData
         }
 
         /// <summary>
+        /// Validates that the property given is defined.
+        /// </summary>
+        /// <param name="propertyInfo">The info of property.</param>
+        /// <param name="throwOnUndeclaredProperty">Whether undeclared property should be prohibited.</param>
+        internal static void ValidatePropertyDefined(PropertySerializationInfo propertyInfo, bool throwOnUndeclaredProperty)
+        {
+            if (throwOnUndeclaredProperty && propertyInfo.IsOpenPropertyInModel)
+            {
+                throw new ODataException(Strings.ValidationUtils_PropertyDoesNotExistOnType(propertyInfo.PropertyName, propertyInfo.OwningType.FullTypeName()));
+            }
+        }
+
+        /// <summary>
         /// Validates that a navigation property with the specified name exists on a given entity type.
         /// The entity type can be null if no metadata is available.
         /// </summary>

@@ -51,10 +51,10 @@ namespace Microsoft.OData.JsonLight
             IEdmTypeReference typeReferenceFromValue,
             bool isOpenProperty)
         {
-            SerializationTypeNameAnnotation typeNameAnnotation = value.GetAnnotation<SerializationTypeNameAnnotation>();
-            if (typeNameAnnotation != null)
+            string typeNameToWrite;
+            if (TypeNameOracle.TryGetTypeNameFromAnnotation(value, out typeNameToWrite))
             {
-                return typeNameAnnotation.TypeName;
+                return typeNameToWrite;
             }
 
             // Do not write type name when the type is native json type.
@@ -68,27 +68,37 @@ namespace Microsoft.OData.JsonLight
             return GetTypeNameFromValue(value);
         }
 
-        internal override string GetValueTypeNameForWritingNewCache(ODataValue value,
-            PropertySerializationInfo propertyInfo, PropertyValueTypeInfo typeReferenceFromValue, bool isOpenProperty)
+        /// <summary>
+        /// Determines the type name to write to the payload.  Json Light type names are only written into the payload for open properties
+        /// or if the payload type name is more derived than the model type name.
+        /// </summary>
+        /// <param name="value">The ODataValue whose type name is to be written.</param>
+        /// <param name="propertyInfo">The serialization info of current property</param>
+        /// <param name="isOpenProperty">true if the type name belongs to an open property, false otherwise.</param>
+        /// <returns>Type name to write to the payload, or null if no type should be written.</returns>
+        internal override string GetValueTypeNameForWriting(
+            ODataValue value,
+            PropertySerializationInfo propertyInfo,
+            bool isOpenProperty)
         {
-            string fullTypeNameFromValue = null;
+            PropertyValueType valueType = propertyInfo.ValueType;
 
-            SerializationTypeNameAnnotation typeNameAnnotation = value.GetAnnotation<SerializationTypeNameAnnotation>();
-            if (typeNameAnnotation != null)
+            string typeNameToWrite;
+            if (TypeNameOracle.TryGetTypeNameFromAnnotation(value, out typeNameToWrite))
             {
-                return typeNameAnnotation.TypeName;
+                return typeNameToWrite;
             }
 
-            if (typeReferenceFromValue != null)
+            if (valueType.TypeReference != null)
             {
                 // Do not write type name when the type is native json type.
-                if (typeReferenceFromValue.IsPrimitive && JsonSharedUtils.ValueTypeMatchesJsonType((ODataPrimitiveValue)value, typeReferenceFromValue.PrimitiveTypeKind))
+                if (valueType.IsPrimitive && JsonSharedUtils.ValueTypeMatchesJsonType((ODataPrimitiveValue)value, valueType.PrimitiveTypeKind))
                 {
                     return null;
                 }
             }
 
-            return fullTypeNameFromValue != null ? fullTypeNameFromValue : GetTypeNameFromValue(value);
+            return GetTypeNameFromValue(value);
         }
     }
 }

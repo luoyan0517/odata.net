@@ -163,6 +163,14 @@ namespace Microsoft.OData.JsonLight
         }
 
         /// <summary>
+        /// The handler to manage property cache.
+        /// </summary>
+        public PropertyCacheHandler PropertyCacheHandler
+        {
+            get { return propertyCacheHandler; }
+        }
+
+        /// <summary>
         /// The Context Url level used when writing.
         /// </summary>
         internal override ODataContextUrlLevel ContextUrlLevel
@@ -171,11 +179,6 @@ namespace Microsoft.OData.JsonLight
             {
                 return metadataLevel.ContextUrlLevel;
             }
-        }
-
-        public PropertyCacheHandler PropertyCacheHandler
-        {
-            get { return propertyCacheHandler; }
         }
 
         /// <summary>

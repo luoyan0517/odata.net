@@ -1,4 +1,10 @@
-﻿using System.Collections.Generic;
+﻿//---------------------------------------------------------------------
+// <copyright file="PropertyInfoCache.cs" company="Microsoft">
+//      Copyright (C) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
+// </copyright>
+//---------------------------------------------------------------------
+
+using System.Collections.Generic;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.OData
@@ -7,42 +13,18 @@ namespace Microsoft.OData
     {
         private Dictionary<string, PropertySerializationInfo> propertyInfoDictionary = new Dictionary<string, PropertySerializationInfo>();
 
-        private Dictionary<string, PropertyValueTypeInfo> typeInfoDictionary =
-            new Dictionary<string, PropertyValueTypeInfo>();
-
-        public PropertyInfoCache()
-        {
-        }
-
-        public PropertySerializationInfo GetPropertyInfo(string name, IEdmStructuredType owningType)
+        public PropertySerializationInfo GetPropertyInfo(string name, string identicalName, IEdmStructuredType owningType)
         {
             PropertySerializationInfo propertyInfo;
-            if (!propertyInfoDictionary.TryGetValue(name, out propertyInfo))
+            if (!propertyInfoDictionary.TryGetValue(identicalName, out propertyInfo))
             {
                 WriterValidationUtils.ValidatePropertyName(name);
+
                 propertyInfo = new PropertySerializationInfo(name, owningType);
-                propertyInfoDictionary[name] = propertyInfo;
+                propertyInfoDictionary[identicalName] = propertyInfo;
             }
+
             return propertyInfo;
-        }
-
-        public bool TryGetTypeInfo(string typeName, out PropertyValueTypeInfo typeInfo)
-        {
-            if (typeInfoDictionary.TryGetValue(typeName, out typeInfo))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public PropertyValueTypeInfo SetTypeInfo(string typeName, IEdmTypeReference typeReference)
-        {
-            PropertyValueTypeInfo typeInfo = new PropertyValueTypeInfo(typeName, typeReference);
-            typeInfoDictionary[typeName] = typeInfo;
-            return typeInfo;
         }
     }
 }

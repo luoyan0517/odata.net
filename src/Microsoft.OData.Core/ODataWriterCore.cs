@@ -52,6 +52,7 @@ namespace Microsoft.OData
         /// <summary>The number of entries which have been started but not yet ended.</summary>
         private int currentResourceDepth;
 
+        /// <summary> Resource name in current writing scope. </summary>
         private string currentResourceName;
 
         /// <summary>
@@ -185,6 +186,9 @@ namespace Microsoft.OData
             }
         }
 
+        /// <summary>
+        /// The scope level the writer is writing.
+        /// </summary>
         protected int ScopeLevel
         {
             get { return this.scopes.Count; }
@@ -796,6 +800,7 @@ namespace Microsoft.OData
             }
 
             this.currentResourceName = resource.TypeName;
+
             // TODO: Clean up handling of expected types/sets during writing
             return (IEdmStructuredType)TypeNameOracle.ResolveAndValidateTypeName(this.outputContext.Model, resource.TypeName, EdmTypeKind.Complex | EdmTypeKind.Entity, this.WriterValidator);
         }

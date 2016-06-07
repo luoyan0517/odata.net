@@ -1,8 +1,11 @@
-﻿using System;
+﻿//---------------------------------------------------------------------
+// <copyright file="PropertyCacheHandler.cs" company="Microsoft">
+//      Copyright (C) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
+// </copyright>
+//---------------------------------------------------------------------
+
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.OData
@@ -23,21 +26,15 @@ namespace Microsoft.OData
 
         public PropertyInfoCache InfoCache
         {
-            get { return propertyInfoCache; }
+            get
+            {
+                return propertyInfoCache;
+            }
+
             set
             {
                 this.cacheStack.Push(this.propertyInfoCache);
                 propertyInfoCache = value;
-            }
-        }
-
-        public int ResourceSetScopeLevel
-        {
-            get { return this.resourceSetScopeLevel; }
-            set
-            {
-                this.scopeLevelStack.Push(this.resourceSetScopeLevel);
-                this.resourceSetScopeLevel = value;
             }
         }
 
@@ -57,19 +54,29 @@ namespace Microsoft.OData
             {
                 identicalName = name + (this.currentResourceScopeLevel - this.resourceSetScopeLevel);
             }
-            this.currentProperty = this.propertyInfoCache.GetPropertyInfo(identicalName, owningType);
+
+            this.currentProperty = this.propertyInfoCache.GetPropertyInfo(name, identicalName, owningType);
             return this.currentProperty;
         }
 
-        public PropertySerializationInfo GetCurrentProperty()
+        public void EnterResourceSetScope(int scopeLevel)
         {
-            return this.currentProperty;
+            this.scopeLevelStack.Push(this.resourceSetScopeLevel);
+            this.resourceSetScopeLevel = scopeLevel;
         }
 
         public void LeaveResourceSetScope()
         {
+            Debug.Assert(this.cacheStack.Count != 0, "this.cacheStack.Count != 0");
+            Debug.Assert(this.scopeLevelStack.Count != 0, "this.scopeLevelStack.Count != 0");
+
             this.resourceSetScopeLevel = this.scopeLevelStack.Pop();
             this.propertyInfoCache = this.cacheStack.Pop();
+        }
+
+        public bool InResourceSetScope()
+        {
+            return this.resourceSetScopeLevel > 0;
         }
     }
 }

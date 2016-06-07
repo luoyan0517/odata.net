@@ -1,10 +1,16 @@
-﻿using Microsoft.OData.Edm;
+﻿//---------------------------------------------------------------------
+// <copyright file="PropertyValueType.cs" company="Microsoft">
+//      Copyright (C) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
+// </copyright>
+//---------------------------------------------------------------------
+
+using Microsoft.OData.Edm;
 
 namespace Microsoft.OData
 {
-    internal class PropertyValueTypeInfo
+    internal class PropertyValueType
     {
-        private string typeName;
+        private readonly string typeName;
 
         private readonly IEdmTypeReference typeReference;
 
@@ -12,13 +18,11 @@ namespace Microsoft.OData
 
         private readonly bool isPrimitive;
 
-        private readonly bool isSpatial;
-
         private readonly bool isComplex;
 
         private readonly EdmPrimitiveTypeKind primitiveTypeKind;
 
-        public PropertyValueTypeInfo(string typeName, IEdmTypeReference typeReference)
+        public PropertyValueType(string typeName, IEdmTypeReference typeReference)
         {
             this.typeName = typeName;
             this.typeReference = typeReference;
@@ -26,7 +30,6 @@ namespace Microsoft.OData
             {
                 this.fullName = typeReference.FullName();
                 this.isPrimitive = typeReference.IsPrimitive();
-                this.isSpatial = typeReference.IsSpatial();
                 this.isComplex = typeReference.IsComplex();
                 this.primitiveTypeKind = this.IsPrimitive ? this.typeReference.AsPrimitive().PrimitiveKind() : EdmPrimitiveTypeKind.None;
             }
@@ -45,11 +48,6 @@ namespace Microsoft.OData
         public bool IsPrimitive
         {
             get { return isPrimitive; }
-        }
-
-        public bool IsSpatial
-        {
-            get { return isSpatial; }
         }
 
         public bool IsComplex

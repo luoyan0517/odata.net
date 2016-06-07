@@ -46,10 +46,10 @@ namespace Microsoft.OData.Json
         /// </summary>
         private static readonly char[] DoubleIndicatingCharacters = new char[] { '.', 'e', 'E' };
 
-        // <summary>
-        // Map of special characters to strings.
-        // </summary>
-        public static readonly string[] SpecialCharToEscapedStringMap = CreateSpecialCharToEscapedStringMap();
+        /// <summary>
+        /// Map of special characters to strings.
+        /// </summary>
+        private static readonly string[] SpecialCharToEscapedStringMap = CreateSpecialCharToEscapedStringMap();
 
         /// <summary>
         /// Initialize static properties
@@ -380,7 +380,6 @@ namespace Microsoft.OData.Json
             {
                 writer.Write(inputString.Substring(startIndex, subStrLength));
             }
-          //  writer.Write(inputString);
 
             writer.Write(JsonConstants.QuoteCharacter);
         }
