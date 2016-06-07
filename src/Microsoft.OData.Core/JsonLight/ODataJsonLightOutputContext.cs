@@ -49,7 +49,7 @@ namespace Microsoft.OData.JsonLight
         /// </summary>
         private JsonLightTypeNameOracle typeNameOracle;
 
-        private PropertyCacheHelper propertyCacheHelper;
+        private PropertyCacheHandler propertyCacheHandler;
 
         /// <summary>
         /// Constructor.
@@ -98,7 +98,7 @@ namespace Microsoft.OData.JsonLight
 
             Uri metadataDocumentUri = messageWriterSettings.MetadataDocumentUri;
             this.metadataLevel = JsonLightMetadataLevel.Create(messageInfo.MediaType, metadataDocumentUri, this.Model, this.WritingResponse);
-            this.propertyCacheHelper = new PropertyCacheHelper();
+            this.propertyCacheHandler = new PropertyCacheHandler();
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Microsoft.OData.JsonLight
             this.textWriter = textWriter;
             this.jsonWriter = CreateJsonWriter(messageInfo.Container, textWriter, messageWriterSettings.EnableIndentation, true /*isIeee754Compatible*/);
             this.metadataLevel = new JsonMinimalMetadataLevel();
-            this.propertyCacheHelper = new PropertyCacheHelper();
+            this.propertyCacheHandler = new PropertyCacheHandler();
         }
 
         /// <summary>
@@ -173,9 +173,9 @@ namespace Microsoft.OData.JsonLight
             }
         }
 
-        public PropertyCacheHelper PropertyHelper
+        public PropertyCacheHandler PropertyCacheHandler
         {
-            get { return propertyCacheHelper; }
+            get { return propertyCacheHandler; }
         }
 
         /// <summary>

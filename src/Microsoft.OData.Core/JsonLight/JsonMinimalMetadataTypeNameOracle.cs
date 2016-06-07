@@ -120,7 +120,7 @@ namespace Microsoft.OData.JsonLight
                 fullTypeNameFromValue = typeReferenceFromValue.FullName;
 
                 // Write type name when the type in the payload is more derived than the type from metadata.
-                if (propertyInfo.PropertyTypeReference != null && propertyInfo.FullName != fullTypeNameFromValue)
+                if (propertyInfo.TypeReference != null && propertyInfo.FullName != fullTypeNameFromValue)
                 {
                     return fullTypeNameFromValue;
                 }
@@ -133,7 +133,7 @@ namespace Microsoft.OData.JsonLight
 
                 // Note: When writing derived complexType value in a payload, we don't have the expected type.
                 // So always write @odata.type for top-level derived complex type.
-                if (propertyInfo.PropertyTypeReference == null && typeReferenceFromValue.IsComplex)
+                if (propertyInfo.TypeReference == null && typeReferenceFromValue.IsComplex)
                 {
                     if ((typeReferenceFromValue.TypeReference as IEdmComplexTypeReference).ComplexDefinition().BaseType != null)
                     {

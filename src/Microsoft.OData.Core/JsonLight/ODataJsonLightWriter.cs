@@ -245,7 +245,7 @@ namespace Microsoft.OData.JsonLight
             // Write the properties
             ProjectedPropertiesAnnotation projectedProperties = GetProjectedPropertiesAnnotation(resourceScope);
 
-            this.jsonLightOutputContext.PropertyHelper.CurrentResourceScopeLevel = this.ScopeLevel;
+            this.jsonLightOutputContext.PropertyCacheHandler.CurrentResourceScopeLevel = this.ScopeLevel;
 
             this.jsonLightResourceSerializer.JsonLightValueSerializer.AssertRecursionDepthIsZero();
             this.jsonLightResourceSerializer.WriteProperties(
@@ -393,7 +393,7 @@ namespace Microsoft.OData.JsonLight
                 }
             }
 
-            this.jsonLightOutputContext.PropertyHelper.ResourceSetScopeLevel = this.ScopeLevel;
+            this.jsonLightOutputContext.PropertyCacheHandler.ResourceSetScopeLevel = this.ScopeLevel;
         }
 
         /// <summary>
@@ -452,7 +452,7 @@ namespace Microsoft.OData.JsonLight
                 }
             }
 
-            this.jsonLightOutputContext.PropertyHelper.LeaveResourceSetScope();
+            this.jsonLightOutputContext.PropertyCacheHandler.LeaveResourceSetScope();
         }
 
         /// <summary>
@@ -579,7 +579,7 @@ namespace Microsoft.OData.JsonLight
         protected override ResourceSetScope CreateResourceSetScope(ODataResourceSet resourceSet, IEdmNavigationSource navigationSource, IEdmStructuredType resourceType, bool skipWriting, SelectedPropertiesNode selectedProperties, ODataUri odataUri)
         {
             JsonLightResourceSetScope resourceSetScope = new JsonLightResourceSetScope(resourceSet, navigationSource, resourceType, skipWriting, selectedProperties, odataUri);
-            this.jsonLightOutputContext.PropertyHelper.InfoCache = resourceSetScope.ResourcePropertyInfoCache;
+            this.jsonLightOutputContext.PropertyCacheHandler.InfoCache = resourceSetScope.ResourcePropertyInfoCache;
             return resourceSetScope;
         }
 

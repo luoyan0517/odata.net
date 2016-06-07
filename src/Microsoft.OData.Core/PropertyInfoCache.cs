@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.OData.Edm;
-using Microsoft.OData.Edm.Vocabularies;
 
 namespace Microsoft.OData
 {
@@ -15,11 +10,16 @@ namespace Microsoft.OData
         private Dictionary<string, PropertyValueTypeInfo> typeInfoDictionary =
             new Dictionary<string, PropertyValueTypeInfo>();
 
+        public PropertyInfoCache()
+        {
+        }
+
         public PropertySerializationInfo GetPropertyInfo(string name, IEdmStructuredType owningType)
         {
             PropertySerializationInfo propertyInfo;
             if (!propertyInfoDictionary.TryGetValue(name, out propertyInfo))
             {
+                WriterValidationUtils.ValidatePropertyName(name);
                 propertyInfo = new PropertySerializationInfo(name, owningType);
                 propertyInfoDictionary[name] = propertyInfo;
             }

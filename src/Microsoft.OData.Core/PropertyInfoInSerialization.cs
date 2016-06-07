@@ -26,7 +26,7 @@ namespace Microsoft.OData
         {
             this.propertyName = name;
             this.owningType = owningType;
-            this.edmProperty = owningType == null? null : owningType.FindProperty(propertyName);
+            this.edmProperty = owningType == null ? null : owningType.FindProperty(propertyName); ;
             this.isUndeclaredProperty = edmProperty == null;
             this.isOpenPropertyInModel = (this.owningType != null && this.owningType.IsOpen && this.isUndeclaredProperty);
             this.propertyTypeReference = this.isUndeclaredProperty ? null : edmProperty.Type;
@@ -58,7 +58,7 @@ namespace Microsoft.OData
             get { return owningType; }
         }
 
-        public IEdmTypeReference PropertyTypeReference
+        public IEdmTypeReference TypeReference
         {
             get { return propertyTypeReference; }
         }

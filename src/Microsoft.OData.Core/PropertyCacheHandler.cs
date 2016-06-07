@@ -7,7 +7,7 @@ using Microsoft.OData.Edm;
 
 namespace Microsoft.OData
 {
-    internal class PropertyCacheHelper
+    internal class PropertyCacheHandler
     {
         private PropertyInfoCache propertyInfoCache;
 
@@ -46,7 +46,7 @@ namespace Microsoft.OData
             set { currentResourceScopeLevel = value; }
         }
 
-        public PropertySerializationInfo GetCurrentProperty(string name, IEdmStructuredType owningType)
+        public PropertySerializationInfo GetProperty(string name, IEdmStructuredType owningType)
         {
             string identicalName;
             if (this.currentResourceScopeLevel == this.resourceSetScopeLevel + 1)
