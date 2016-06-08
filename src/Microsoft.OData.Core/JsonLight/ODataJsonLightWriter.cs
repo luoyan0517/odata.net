@@ -579,7 +579,7 @@ namespace Microsoft.OData.JsonLight
         protected override ResourceSetScope CreateResourceSetScope(ODataResourceSet resourceSet, IEdmNavigationSource navigationSource, IEdmStructuredType resourceType, bool skipWriting, SelectedPropertiesNode selectedProperties, ODataUri odataUri)
         {
             JsonLightResourceSetScope resourceSetScope = new JsonLightResourceSetScope(resourceSet, navigationSource, resourceType, skipWriting, selectedProperties, odataUri);
-            this.jsonLightOutputContext.PropertyCacheHandler.SetCacheForCurrentResourceSet();
+            this.jsonLightOutputContext.PropertyCacheHandler.SetCacheForCurrentResourceSet(this.CurrentScope.ResourceType);
             return resourceSetScope;
         }
 

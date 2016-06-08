@@ -1377,12 +1377,12 @@ namespace Microsoft.OData
                         odataUri = currentScope.ODataUri.Clone();
 
                         IEdmStructuredType currentResourceType = currentScope.ResourceType;
-                        var ComplexProperty = this.WriterValidator.ValidatePropertyDefined(
+                        var structuredProperty = this.WriterValidator.ValidatePropertyDefined(
                             nestedResourceInfo.Name, currentResourceType)
                             as IEdmStructuralProperty;
-                        if (ComplexProperty != null)
+                        if (structuredProperty != null)
                         {
-                            resourceType = ComplexProperty.Type.ToStructuredType();
+                            resourceType = structuredProperty.Type.ToStructuredType();
                             navigationSource = null;
                         }
                         else

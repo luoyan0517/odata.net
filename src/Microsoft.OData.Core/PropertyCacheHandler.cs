@@ -24,6 +24,8 @@ namespace Microsoft.OData
 
         private Stack<int> scopeLevelStack = new Stack<int>();
 
+        private Dictionary<IEdmStructuredType, PropertyInfoCache> cacheDictionary = new Dictionary<IEdmStructuredType, PropertyInfoCache>();
+
         public PropertySerializationInfo GetProperty(string name, IEdmStructuredType owningType)
         {
             string identicalName;
@@ -45,11 +47,24 @@ namespace Microsoft.OData
             this.currentResourceScopeLevel = level;
         }
 
-        public void SetCacheForCurrentResourceSet()
+        public void SetCacheForCurrentResourceSet(IEdmStructuredType resourceType)
         {
-            PropertyInfoCache newCache = new PropertyInfoCache();
+            PropertyInfoCache propertyCache;
+            if (resourceType != null)
+            {
+                if (!cacheDictionary.TryGetValue(resourceType, out propertyCache))
+                {
+                    propertyCache = new PropertyInfoCache();
+                    cacheDictionary[resourceType] = propertyCache;
+                }
+            }
+            else
+            {
+                propertyCache = new PropertyInfoCache();
+            }
+
             this.cacheStack.Push(this.propertyInfoCache);
-            propertyInfoCache = newCache;
+            propertyInfoCache = propertyCache;
         }
 
         public void EnterResourceSetScope(int scopeLevel)
