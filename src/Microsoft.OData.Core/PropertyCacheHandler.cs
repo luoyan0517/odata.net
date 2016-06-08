@@ -24,20 +24,6 @@ namespace Microsoft.OData
 
         private Stack<int> scopeLevelStack = new Stack<int>();
 
-        public PropertyInfoCache InfoCache
-        {
-            get
-            {
-                return propertyInfoCache;
-            }
-
-            set
-            {
-                this.cacheStack.Push(this.propertyInfoCache);
-                propertyInfoCache = value;
-            }
-        }
-
         public int CurrentResourceScopeLevel
         {
             set { currentResourceScopeLevel = value; }
@@ -57,6 +43,13 @@ namespace Microsoft.OData
 
             this.currentProperty = this.propertyInfoCache.GetPropertyInfo(name, identicalName, owningType);
             return this.currentProperty;
+        }
+
+        public void SetCacheForCurrentResourceSet()
+        {
+            PropertyInfoCache newCache = new PropertyInfoCache();
+            this.cacheStack.Push(this.propertyInfoCache);
+            propertyInfoCache = newCache;
         }
 
         public void EnterResourceSetScope(int scopeLevel)

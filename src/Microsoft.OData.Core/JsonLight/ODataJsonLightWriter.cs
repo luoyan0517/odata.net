@@ -579,7 +579,7 @@ namespace Microsoft.OData.JsonLight
         protected override ResourceSetScope CreateResourceSetScope(ODataResourceSet resourceSet, IEdmNavigationSource navigationSource, IEdmStructuredType resourceType, bool skipWriting, SelectedPropertiesNode selectedProperties, ODataUri odataUri)
         {
             JsonLightResourceSetScope resourceSetScope = new JsonLightResourceSetScope(resourceSet, navigationSource, resourceType, skipWriting, selectedProperties, odataUri);
-            this.jsonLightOutputContext.PropertyCacheHandler.InfoCache = resourceSetScope.ResourcePropertyInfoCache;
+            this.jsonLightOutputContext.PropertyCacheHandler.SetCacheForCurrentResourceSet();
             return resourceSetScope;
         }
 
@@ -746,9 +746,6 @@ namespace Microsoft.OData.JsonLight
             /// <summary>true if the odata.deltaLink was already written, false otherwise.</summary>
             private bool deltaLinkWritten;
 
-            /// <summary>the cache in current scope to store property info between ODataResource. </summary>
-            private PropertyInfoCache resourcePropertyInfoCache;
-
             /// <summary>
             /// Constructor to create a new resource set scope.
             /// </summary>
@@ -761,7 +758,6 @@ namespace Microsoft.OData.JsonLight
             internal JsonLightResourceSetScope(ODataResourceSet resourceSet, IEdmNavigationSource navigationSource, IEdmStructuredType resourceType, bool skipWriting, SelectedPropertiesNode selectedProperties, ODataUri odataUri)
                 : base(resourceSet, navigationSource, resourceType, skipWriting, selectedProperties, odataUri)
             {
-                this.resourcePropertyInfoCache = new PropertyInfoCache();
             }
 
             /// <summary>
@@ -794,14 +790,6 @@ namespace Microsoft.OData.JsonLight
                 {
                     this.deltaLinkWritten = value;
                 }
-            }
-
-            /// <summary>
-            /// the cache in current scope to store property info between ODataResource.
-            /// </summary>
-            internal PropertyInfoCache ResourcePropertyInfoCache
-            {
-                get { return this.resourcePropertyInfoCache; }
             }
         }
 
