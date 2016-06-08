@@ -24,11 +24,6 @@ namespace Microsoft.OData
 
         private Stack<int> scopeLevelStack = new Stack<int>();
 
-        public int CurrentResourceScopeLevel
-        {
-            set { currentResourceScopeLevel = value; }
-        }
-
         public PropertySerializationInfo GetProperty(string name, IEdmStructuredType owningType)
         {
             string identicalName;
@@ -43,6 +38,11 @@ namespace Microsoft.OData
 
             this.currentProperty = this.propertyInfoCache.GetPropertyInfo(name, identicalName, owningType);
             return this.currentProperty;
+        }
+
+        public void SetCurrentResourceScopeLevel(int level)
+        {
+            this.currentResourceScopeLevel = level;
         }
 
         public void SetCacheForCurrentResourceSet()

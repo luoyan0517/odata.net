@@ -245,7 +245,7 @@ namespace Microsoft.OData.JsonLight
             // Write the properties
             ProjectedPropertiesAnnotation projectedProperties = GetProjectedPropertiesAnnotation(resourceScope);
 
-            this.jsonLightOutputContext.PropertyCacheHandler.CurrentResourceScopeLevel = this.ScopeLevel;
+            this.jsonLightOutputContext.PropertyCacheHandler.SetCurrentResourceScopeLevel(this.ScopeLevel);
 
             this.jsonLightResourceSerializer.JsonLightValueSerializer.AssertRecursionDepthIsZero();
             this.jsonLightResourceSerializer.WriteProperties(
