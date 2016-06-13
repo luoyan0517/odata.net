@@ -1572,17 +1572,20 @@
     <Compile Include="..\ODataNullValueBehaviorKind.cs">
       <Link>Microsoft\OData\Core\ODataNullValueBehaviorKind.cs</Link>
     </Compile>
+    <Compile Include="..\PropertyCache.cs">
+      <Link>PropertyCache.cs</Link>
+    </Compile>
     <Compile Include="..\PropertyCacheHandler.cs">
       <Link>Microsoft\OData\Core\PropertyCacheHandler.cs</Link>
     </Compile>
-    <Compile Include="..\PropertyInfoCache.cs">
-      <Link>Microsoft\OData\Core\PropertyInfoCache.cs</Link>
+    <Compile Include="..\PropertyMetadataTypeInfo.cs">
+      <Link>PropertyMetadataTypeInfo.cs</Link>
     </Compile>
     <Compile Include="..\PropertySerializationInfo.cs">
       <Link>Microsoft\OData\Core\PropertySerializationInfo.cs</Link>
     </Compile>
-    <Compile Include="..\PropertyValueType.cs">
-      <Link>Microsoft\OData\Core\PropertyValueType.cs</Link>
+    <Compile Include="..\PropertyValueTypeInfo.cs">
+      <Link>PropertyValueTypeInfo.cs</Link>
     </Compile>
     <Compile Include="..\ServicePrototype.cs">
       <Link>Microsoft\OData\Core\ServicePrototype.cs</Link>

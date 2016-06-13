@@ -81,7 +81,7 @@ namespace Microsoft.OData.JsonLight
             PropertySerializationInfo propertyInfo,
             bool isOpenProperty)
         {
-            PropertyValueType valueType = propertyInfo.ValueType;
+            PropertyValueTypeInfo valueType = propertyInfo.ValueType;
 
             string typeNameToWrite;
             if (TypeNameOracle.TryGetTypeNameFromAnnotation(value, out typeNameToWrite))

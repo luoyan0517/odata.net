@@ -10,36 +10,39 @@ using Microsoft.OData.Edm;
 
 namespace Microsoft.OData
 {
+    /// <summary>
+    /// Manage PropertyCache for ODataResourceSet in serialization.
+    /// One ODataResourceSet has one PropertyCache.
+    /// ODataResourceSets with same resource type share the same PropertyCache.
+    /// </summary>
     internal class PropertyCacheHandler
     {
-        private PropertyInfoCache propertyInfoCache;
+        private readonly Stack<PropertyCache> cacheStack = new Stack<PropertyCache>();
 
-        private PropertySerializationInfo currentProperty;
+        private readonly Stack<int> scopeLevelStack = new Stack<int>();
+
+        private readonly Dictionary<IEdmStructuredType, PropertyCache> cacheDictionary = new Dictionary<IEdmStructuredType, PropertyCache>();
+
+        private PropertyCache currentPropertyCache;
 
         private int resourceSetScopeLevel;
 
         private int currentResourceScopeLevel;
 
-        private Stack<PropertyInfoCache> cacheStack = new Stack<PropertyInfoCache>();
-
-        private Stack<int> scopeLevelStack = new Stack<int>();
-
-        private Dictionary<IEdmStructuredType, PropertyInfoCache> cacheDictionary = new Dictionary<IEdmStructuredType, PropertyInfoCache>();
-
         public PropertySerializationInfo GetProperty(string name, IEdmStructuredType owningType)
         {
-            string identicalName;
+            string uniqueName;
             if (this.currentResourceScopeLevel == this.resourceSetScopeLevel + 1)
             {
-                identicalName = name;
+                uniqueName = name;
             }
             else
             {
-                identicalName = name + (this.currentResourceScopeLevel - this.resourceSetScopeLevel);
+                // To avoid the property name conflicts of single navigation property and navigation source
+                uniqueName = name + (this.currentResourceScopeLevel - this.resourceSetScopeLevel);
             }
 
-            this.currentProperty = this.propertyInfoCache.GetPropertyInfo(name, identicalName, owningType);
-            return this.currentProperty;
+            return this.currentPropertyCache.GetProperty(name, uniqueName, owningType);
         }
 
         public void SetCurrentResourceScopeLevel(int level)
@@ -47,28 +50,27 @@ namespace Microsoft.OData
             this.currentResourceScopeLevel = level;
         }
 
-        public void SetCacheForCurrentResourceSet(IEdmStructuredType resourceType)
+        public void EnterResourceSetScope(IEdmStructuredType resourceType, int scopeLevel)
         {
-            PropertyInfoCache propertyCache;
+            // Set cache for current resource set
+            PropertyCache propertyCache;
             if (resourceType != null)
             {
                 if (!cacheDictionary.TryGetValue(resourceType, out propertyCache))
                 {
-                    propertyCache = new PropertyInfoCache();
+                    propertyCache = new PropertyCache();
                     cacheDictionary[resourceType] = propertyCache;
                 }
             }
             else
             {
-                propertyCache = new PropertyInfoCache();
+                propertyCache = new PropertyCache();
             }
 
-            this.cacheStack.Push(this.propertyInfoCache);
-            propertyInfoCache = propertyCache;
-        }
+            this.cacheStack.Push(this.currentPropertyCache);
+            this.currentPropertyCache = propertyCache;
 
-        public void EnterResourceSetScope(int scopeLevel)
-        {
+            // Set scope level for current resource set
             this.scopeLevelStack.Push(this.resourceSetScopeLevel);
             this.resourceSetScopeLevel = scopeLevel;
         }
@@ -79,7 +81,7 @@ namespace Microsoft.OData
             Debug.Assert(this.scopeLevelStack.Count != 0, "this.scopeLevelStack.Count != 0");
 
             this.resourceSetScopeLevel = this.scopeLevelStack.Pop();
-            this.propertyInfoCache = this.cacheStack.Pop();
+            this.currentPropertyCache = this.cacheStack.Pop();
         }
 
         public bool InResourceSetScope()

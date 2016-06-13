@@ -9,89 +9,41 @@ using Microsoft.OData.JsonLight;
 
 namespace Microsoft.OData
 {
+    /// <summary>
+    /// The class to hold all the info needed for a property in serialization.
+    /// </summary>
     internal class PropertySerializationInfo
     {
-        private readonly string propertyName;
-
-        private readonly IEdmStructuredType owningType;
-
-        private readonly IEdmTypeReference propertyTypeReference;
-
-        private readonly IEdmProperty edmProperty;
-
-        private readonly string fullName;
-
-        private readonly bool isUndeclaredProperty;
-
-        private bool isOpenPropertyInModel;
-
-        private PropertyValueType valueType;
-
-        private string typeNameToWrite;
-
-        private bool isTopLevel = false;
-
-        private string wireName;
+        private bool isTopLevel;
 
         public PropertySerializationInfo(string name, IEdmStructuredType owningType)
         {
-            this.propertyName = name;
-            this.owningType = owningType;
-            this.edmProperty = owningType == null ? null : owningType.FindProperty(propertyName);
-            this.isUndeclaredProperty = edmProperty == null;
-            this.isOpenPropertyInModel = (this.owningType != null && this.owningType.IsOpen && this.isUndeclaredProperty);
-            this.propertyTypeReference = this.isUndeclaredProperty ? null : edmProperty.Type;
-            this.fullName = this.propertyTypeReference == null ? null : this.propertyTypeReference.Definition.AsActualType().FullTypeName();
-            this.wireName = isTopLevel ? JsonLightConstants.ODataValuePropertyName : propertyName;
+            this.PropertyName = name;
+            this.IsTopLevel = false;
+            this.MetadataType = new PropertyMetadataTypeInfo(name, owningType);
         }
 
-        public IEdmProperty EdmProperty
-        {
-            get { return this.edmProperty; }
-        }
+        /// <summary>Name of current property.</summary>
+        public string PropertyName { get; private set; }
 
-        public bool IsOpenPropertyInModel
-        {
-            get { return isOpenPropertyInModel; }
-        }
+        /// <summary>
+        /// The type info resolved from property value.
+        /// The value type info might change for a property in different ODataResource of an ODataResourceSet.
+        /// </summary>
+        public PropertyValueTypeInfo ValueType { get; set; }
 
-        public bool IsUndeclaredProperty
-        {
-            get { return isUndeclaredProperty; }
-        }
+        /// <summary>The type info resolved from metadata.</summary>
+        public PropertyMetadataTypeInfo MetadataType { get; private set; }
 
-        public string PropertyName
-        {
-            get { return propertyName; }
-        }
+        /// <summary>
+        /// The value of '@odata.type' for current property, if the value is null, no type annotation needed.
+        /// </summary>
+        public string TypeNameToWrite { get; set; }
 
-        public IEdmStructuredType OwningType
-        {
-            get { return owningType; }
-        }
+        /// <summary>The property name written in the wire.</summary>
+        public string WireName { get; private set; }
 
-        public IEdmTypeReference TypeReference
-        {
-            get { return propertyTypeReference; }
-        }
-
-        public string FullName
-        {
-            get { return fullName; }
-        }
-
-        public PropertyValueType ValueType
-        {
-            get { return valueType; }
-            set { valueType = value; }
-        }
-
-        public string TypeNameToWrite
-        {
-            get { return typeNameToWrite; }
-            set { typeNameToWrite = value; }
-        }
-
+        /// <summary>Whether the property is top level.</summary>
         public bool IsTopLevel
         {
             get
@@ -102,13 +54,8 @@ namespace Microsoft.OData
             set
             {
                 isTopLevel = value;
-                this.wireName = isTopLevel ? JsonLightConstants.ODataValuePropertyName : propertyName;
+                this.WireName = isTopLevel ? JsonLightConstants.ODataValuePropertyName : this.PropertyName;
             }
-        }
-
-        public string WireName
-        {
-            get { return this.wireName; }
         }
     }
 }

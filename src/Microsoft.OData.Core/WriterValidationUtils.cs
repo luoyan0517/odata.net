@@ -105,9 +105,9 @@ namespace Microsoft.OData
         /// <param name="throwOnUndeclaredProperty">Whether undeclared property should be prohibited.</param>
         internal static void ValidatePropertyDefined(PropertySerializationInfo propertyInfo, bool throwOnUndeclaredProperty)
         {
-            if (throwOnUndeclaredProperty && propertyInfo.IsOpenPropertyInModel)
+            if (throwOnUndeclaredProperty && propertyInfo.MetadataType.IsOpenProperty)
             {
-                throw new ODataException(Strings.ValidationUtils_PropertyDoesNotExistOnType(propertyInfo.PropertyName, propertyInfo.OwningType.FullTypeName()));
+                throw new ODataException(Strings.ValidationUtils_PropertyDoesNotExistOnType(propertyInfo.PropertyName, propertyInfo.MetadataType.OwningType.FullTypeName()));
             }
         }
 

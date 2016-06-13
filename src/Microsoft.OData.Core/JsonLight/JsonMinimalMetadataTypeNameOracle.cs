@@ -114,11 +114,12 @@ namespace Microsoft.OData.JsonLight
         /// <returns>Type name to write to the payload, or null if no type should be written.</returns>
         internal override string GetValueTypeNameForWriting(
             ODataValue value,
-            PropertySerializationInfo propertyInfo, 
+            PropertySerializationInfo propertyInfo,
             bool isOpenProperty)
         {
             string fullTypeNameFromValue = null;
-            PropertyValueType valueType = propertyInfo.ValueType;
+            PropertyValueTypeInfo valueType = propertyInfo.ValueType;
+            PropertyMetadataTypeInfo modelType = propertyInfo.MetadataType;
 
             string typeNameToWrite;
             if (TypeNameOracle.TryGetTypeNameFromAnnotation(value, out typeNameToWrite))
@@ -131,7 +132,7 @@ namespace Microsoft.OData.JsonLight
                 fullTypeNameFromValue = valueType.FullName;
 
                 // Write type name when the type in the payload is more derived than the type from metadata.
-                if (propertyInfo.TypeReference != null && propertyInfo.FullName != fullTypeNameFromValue)
+                if (modelType.TypeReference != null && modelType.FullName != fullTypeNameFromValue)
                 {
                     return fullTypeNameFromValue;
                 }
@@ -144,7 +145,7 @@ namespace Microsoft.OData.JsonLight
 
                 // Note: When writing derived complexType value in a payload, we don't have the expected type.
                 // So always write @odata.type for top-level derived complex type.
-                if (propertyInfo.TypeReference == null && valueType.IsComplex)
+                if (modelType.TypeReference == null && valueType.IsComplex)
                 {
                     if ((valueType.TypeReference as IEdmComplexTypeReference).ComplexDefinition().BaseType != null)
                     {

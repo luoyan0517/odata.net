@@ -1,5 +1,5 @@
 ﻿//---------------------------------------------------------------------
-// <copyright file="PropertyInfoCache.cs" company="Microsoft">
+// <copyright file="PropertyCache.cs" company="Microsoft">
 //      Copyright (C) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 // </copyright>
 //---------------------------------------------------------------------
@@ -9,19 +9,22 @@ using Microsoft.OData.Edm;
 
 namespace Microsoft.OData
 {
-    internal class PropertyInfoCache
+    /// <summary>
+    /// The cache to store property info during serialization.
+    /// </summary>
+    internal class PropertyCache
     {
-        private Dictionary<string, PropertySerializationInfo> propertyInfoDictionary = new Dictionary<string, PropertySerializationInfo>();
+        private readonly Dictionary<string, PropertySerializationInfo> propertyInfoDictionary = new Dictionary<string, PropertySerializationInfo>();
 
-        public PropertySerializationInfo GetPropertyInfo(string name, string identicalName, IEdmStructuredType owningType)
+        public PropertySerializationInfo GetProperty(string name, string uniqueName, IEdmStructuredType owningType)
         {
             PropertySerializationInfo propertyInfo;
-            if (!propertyInfoDictionary.TryGetValue(identicalName, out propertyInfo))
+            if (!propertyInfoDictionary.TryGetValue(uniqueName, out propertyInfo))
             {
                 WriterValidationUtils.ValidatePropertyName(name);
 
                 propertyInfo = new PropertySerializationInfo(name, owningType);
-                propertyInfoDictionary[identicalName] = propertyInfo;
+                propertyInfoDictionary[uniqueName] = propertyInfo;
             }
 
             return propertyInfo;
