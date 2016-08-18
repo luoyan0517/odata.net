@@ -143,12 +143,15 @@ namespace Microsoft.OData
             }
 
             // If we are creating an ODataResourceTypeContext for an item in Navigation Source(e.g. an entity set)
-            // or we are creating it for a complex item, we will create an ODataResourceTypeContextWithModel.
-            if ((navigationSource != null && expectedResourceType != null) ||
-                (expectedResourceType != null && expectedResourceType.IsODataComplexTypeKind()))
+            if (expectedResourceType != null && expectedResourceType.IsODataComplexTypeKind())
             {
-                return new ODataResourceTypeContextWithModel(navigationSource, navigationSourceEntityType,
-                    expectedResourceType);
+                return new ODataResourceTypeContextWithModel(null, null, expectedResourceType);
+            }
+
+            // or we are creating it for a complex item, we will create an ODataResourceTypeContextWithModel with navigation source is null.
+            if (navigationSource != null && expectedResourceType != null)
+            {
+                return new ODataResourceTypeContextWithModel(navigationSource, navigationSourceEntityType, expectedResourceType);
             }
 
             return new ODataResourceTypeContext(expectedResourceType, throwIfMissingTypeInfo);

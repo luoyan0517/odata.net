@@ -1009,7 +1009,7 @@ namespace Microsoft.OData.Tests.IntegrationTests.Evaluation
         }
 
         [Fact]
-        public void WritingInFullMetadataModeWithExpandWithContainedElementShouldThrowExceptionIfODataPathIsNotSet()
+        public void WritingInFullMetadataModeWithExpandWithContainedElementWillNotThrowExceptionIfODataPathIsNotSet()
         {
             ODataItem[] itemsToWrite = new ODataItem[]
             {
@@ -1023,7 +1023,7 @@ namespace Microsoft.OData.Tests.IntegrationTests.Evaluation
 
 
             Action test = () => this.GetWriterOutputForContentTypeAndKnobValue("application/json;odata.metadata=full", true, itemsToWrite, Model, EntitySet, EntityType, selectClause, expandClause);
-            test.ShouldThrow<ODataException>().WithMessage(Strings.ODataWriterCore_PathInODataUriMustBeSetWhenWritingContainedElement);
+            test.ShouldNotThrow();
         }
 
         [Fact]

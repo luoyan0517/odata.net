@@ -461,7 +461,9 @@ namespace Microsoft.OData.JsonLight
             {
                 // Write @odata.context annotation for navigation property
                 var containedEntitySet = this.CurrentScope.NavigationSource as IEdmContainedEntitySet;
-                if (containedEntitySet != null)
+
+                // We can actually compute id for containment in reader now, here still writing context is just for backward-compatibility.
+                if (containedEntitySet != null && !(this.ParentResourceType is IEdmComplexType))
                 {
                     ODataContextUrlInfo info = ODataContextUrlInfo.Create(
                                                 this.CurrentScope.NavigationSource,

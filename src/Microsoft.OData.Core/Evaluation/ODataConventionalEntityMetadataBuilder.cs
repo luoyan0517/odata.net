@@ -594,7 +594,7 @@ namespace Microsoft.OData.Evaluation
                 uri = this.UriBuilder.BuildBaseUri();
                 ODataUri odataUri = this.ODataUri ?? this.MetadataContext.ODataUri;
 
-                if (odataUri == null || odataUri.Path == null)
+                if (odataUri == null || odataUri.Path == null || odataUri.Path.Count == 0)
                 {
                     throw new ODataException(Strings.ODataMetadataBuilder_MissingParentIdOrContextUrl);
                 }
@@ -732,7 +732,7 @@ namespace Microsoft.OData.Evaluation
             while (nextToLastSegment is TypeSegment)
             {
                 ODataPathSegment previousSegment = segments[segments.Count - 2];
-                IEdmEntityType ownerType = previousSegment.TargetEdmType as IEdmEntityType;
+                IEdmStructuredType ownerType = previousSegment.TargetEdmType as IEdmStructuredType;
                 if (ownerType != null && ownerType.FindProperty(lastSegment.Identifier) != null)
                 {
                     segments.Remove(nextToLastSegment);

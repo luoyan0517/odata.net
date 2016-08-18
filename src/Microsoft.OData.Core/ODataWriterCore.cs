@@ -1221,7 +1221,8 @@ namespace Microsoft.OData
 
                                 if (this.CurrentScope.NavigationSource == null)
                                 {
-                                    this.CurrentScope.NavigationSource = parentNavigationSource == null ? null : parentNavigationSource.FindNavigationTarget(navigationProperty, MatchBindingPath);
+                                    IEdmPathExpression bindingPath;
+                                    this.CurrentScope.NavigationSource = parentNavigationSource == null ? null : parentNavigationSource.FindNavigationTarget(navigationProperty, BindingPathHelper.MatchBindingPath, this.CurrentScope.ODataUri.Path.ToList(), out bindingPath);
                                 }
                             }
                         }
@@ -1354,7 +1355,12 @@ namespace Microsoft.OData
             IEdmNavigationSource navigationSource = null;
             IEdmStructuredType resourceType = null;
             SelectedPropertiesNode selectedProperties = currentScope.SelectedProperties;
-            ODataUri odataUri = currentScope.ODataUri;
+            ODataUri odataUri = currentScope.ODataUri.Clone();
+            if (odataUri.Path == null)
+            {
+                odataUri.Path = new ODataPath();
+            }
+
             WriterState currentState = currentScope.State;
 
             if (newState == WriterState.Resource || newState == WriterState.ResourceSet)
@@ -1408,16 +1414,25 @@ namespace Microsoft.OData
 
                     if (this.outputContext.WritingResponse)
                     {
-                        odataUri = currentScope.ODataUri.Clone();
-
+                        ODataPath odataPath = odataUri.Path;
                         IEdmStructuredType currentResourceType = currentScope.ResourceType;
+
+                        var resourceScope = currentScope as ResourceScope;
+                        if (resourceScope.ResourceTypeFromMetadata != currentResourceType)
+                        {
+                            odataPath.Add(new TypeSegment(currentResourceType, currentResourceType, null));
+                        }
+
                         var structuredProperty = this.WriterValidator.ValidatePropertyDefined(
                             nestedResourceInfo.Name, currentResourceType)
                             as IEdmStructuralProperty;
+
+                        // Handle complex type property.
                         if (structuredProperty != null)
                         {
                             resourceType = structuredProperty.Type.ToStructuredType();
                             navigationSource = null;
+                            odataPath = odataPath.AppendPropertySegment(structuredProperty);
                         }
                         else
                         {
@@ -1426,10 +1441,11 @@ namespace Microsoft.OData
                             {
                                 resourceType = navigationProperty.ToEntityType();
                                 IEdmNavigationSource currentNavigationSource = currentScope.NavigationSource;
+                                IEdmPathExpression bindingPath;
 
                                 navigationSource = currentNavigationSource == null
                                     ? null
-                                    : currentNavigationSource.FindNavigationTarget(navigationProperty, MatchBindingPath);
+                                    : currentNavigationSource.FindNavigationTarget(navigationProperty, BindingPathHelper.MatchBindingPath, this.CurrentScope.ODataUri.Path.ToList(), out bindingPath);
 
                                 SelectExpandClause clause = odataUri.SelectAndExpand;
                                 TypeSegment typeCastFromExpand = null;
@@ -1440,7 +1456,6 @@ namespace Microsoft.OData
                                     odataUri.SelectAndExpand = subClause;
                                 }
 
-                                ODataPath odataPath;
                                 switch (navigationSource.NavigationSourceKind())
                                 {
                                     case EdmNavigationSourceKind.ContainedEntitySet:
@@ -1449,23 +1464,14 @@ namespace Microsoft.OData
                                             throw new ODataException(Strings.ODataWriterCore_PathInODataUriMustBeSetWhenWritingContainedElement);
                                         }
 
-                                        odataPath = odataUri.Path;
                                         if (ShouldAppendKey(currentNavigationSource, currentResourceType))
                                         {
-                                            IEdmEntityType currentEntityType = currentScope.ResourceType as IEdmEntityType;
+                                            IEdmEntityType currentEntityType = currentResourceType as IEdmEntityType;
                                             ODataItem odataItem = this.CurrentScope.Item;
-                                            Debug.Assert(odataItem is ODataResource, "If the current state is Resource the current item must be an ODataResource as well (and not null either).");
-                                            ODataResource resource = (ODataResource)odataItem;
+                                            ODataResource resource = odataItem as ODataResource;
+                                            Debug.Assert(resource != null, "If the current state is Resource the current item must be an ODataResource as well (and not null either).");
                                             KeyValuePair<string, object>[] keys = ODataResourceMetadataContext.GetKeyProperties(resource, this.GetResourceSerializationInfo(resource), currentEntityType);
                                             odataPath = odataPath.AppendKeySegment(keys, currentEntityType, currentNavigationSource);
-                                        }
-
-                                        // TODO: FindProperty from ParentResourceType of ParentNestedResourceInfo which is maybe entity type and complex type, in order to support complex/complex/containment.
-                                        if (currentResourceType is IEdmComplexType && currentNavigationSource != null && ParentNestedResourceInfo != null)
-                                        {
-                                            IEdmStructuralProperty complex = currentNavigationSource.EntityType().FindProperty(ParentNestedResourceInfo.Name) as IEdmStructuralProperty;
-
-                                            odataPath = odataPath.AppendPropertySegment(complex);
                                         }
 
                                         if (odataPath != null && typeCastFromExpand != null)
@@ -1487,10 +1493,10 @@ namespace Microsoft.OData
                                         odataPath = null;
                                         break;
                                 }
-
-                                odataUri.Path = odataPath;
                             }
                         }
+
+                        odataUri.Path = odataPath;
                     }
                 }
             }
@@ -1498,6 +1504,11 @@ namespace Microsoft.OData
             {
                 // When we're entering a resource scope on a resourceSet, increment the count of entries on that resourceSet.
                 ((ResourceSetScope)currentScope).ResourceCount++;
+            }
+
+            if (navigationSource == null)
+            {
+                navigationSource = this.CurrentScope.NavigationSource ?? odataUri.Path.BelongingNavigationSource();
             }
 
             this.PushScope(newState, item, navigationSource, resourceType, skipWriting, selectedProperties, odataUri);
@@ -1739,69 +1750,6 @@ namespace Microsoft.OData
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Determine the path of current navigation property is matching the binding path.
-        /// The function used in FindNavigationTarget to resolve the navigation target for multi binding.
-        /// </summary>
-        /// <param name="bindingPath">The binding path.</param>
-        /// <returns>True if the path of navigation property in current scope is matching the <paramref name="bindingPath"/>.</returns>
-        private bool MatchBindingPath(IEdmPathExpression bindingPath)
-        {
-            Debug.Assert(this.CurrentScope is ResourceScope || this.CurrentScope is NestedResourceInfoScope,
-                "Only need find navigation property in ResourceScope and NestedResourceInfoScope");
-
-            List<string> paths = bindingPath.PathSegments.ToList();
-
-            // If binding path only includes navigation property name, it matches.
-            if (paths.Count == 1)
-            {
-                return true;
-            }
-
-            List<Scope> scopes = this.scopeStack.Scopes.ToList();
-
-            Debug.Assert(scopes.Count > 1);
-
-            int pathIndex = paths.Count - 2; // Skip the last segment which is navigation property name.
-
-            // Match from tail to head.
-            for (int i = 0; i < scopes.Count - 1; i++)
-            {
-                Scope scope = scopes[i];
-                if (scope is NestedResourceInfoScope)
-                {
-                    if (pathIndex < 0 || string.CompareOrdinal(((ODataNestedResourceInfo)scope.Item).Name, paths[pathIndex]) != 0)
-                    {
-                        return false;
-                    }
-
-                    pathIndex--;
-                }
-                else if (scope is ResourceScope)
-                {
-                    // If the binding path includes type cast, try to match the type.
-                    if (pathIndex >= 0 && paths[pathIndex].Contains("."))
-                    {
-                        if (string.CompareOrdinal(paths[pathIndex], scope.ResourceType.FullTypeName()) != 0)
-                        {
-                            return false;
-                        }
-
-                        pathIndex--;
-                    }
-
-                    // Break the match since non-contained entity should not be in binding path.
-                    if (scope.ResourceType is IEdmEntityType && !(scope.NavigationSource is IEdmContainedEntitySet))
-                    {
-                        break;
-                    }
-                }
-            }
-
-            // Return true if all the segments in binding path have been matched.
-            return pathIndex == -1 ? true : false;
         }
 
         /// <summary>

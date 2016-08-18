@@ -212,5 +212,31 @@ namespace Microsoft.OData.UriParser
         {
             return new ODataExpandPath(path);
         }
+
+        /// <summary>
+        /// Gets the last EntitySetSegment and returns its navigation source.
+        /// </summary>
+        /// <param name="path">>Path to compute the set for.</param>
+        /// <returns>The navigation source of last EntitySetSegment.</returns>
+        internal static IEdmNavigationSource BelongingNavigationSource(this ODataPath path)
+        {
+            if (path == null)
+            {
+                return null;
+            }
+
+            var segments = path.ToList();
+
+            for (int i = segments.Count - 1; i >= 0; i--)
+            {
+                var entitySetSegment = segments[i] as EntitySetSegment;
+                if (entitySetSegment != null)
+                {
+                    return entitySetSegment.TargetEdmNavigationSource;
+                }
+            }
+
+            return null;
+        }
     }
 }

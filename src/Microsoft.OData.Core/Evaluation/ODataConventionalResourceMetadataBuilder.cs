@@ -81,7 +81,8 @@ namespace Microsoft.OData.Evaluation
         /// Gets edit url of current resource.
         /// Computes edit url of current resource from:
         /// 1. NonComputedEditLink
-        /// 2. Parent edit url
+        /// 2. CanonicalUrl
+        /// 3. Parent edit url
         /// </summary>
         /// <returns>The edit url of current resource.</returns>
         /// <remarks>The method is used to compute edit Url for current resource, including complex.</remarks>
@@ -96,6 +97,13 @@ namespace Microsoft.OData.Evaluation
             if (this.resource.HasNonComputedEditLink)
             {
                 return this.editUrl = this.resource.NonComputedEditLink;
+            }
+
+            // Compute editUrl from canonicalUrl
+            var canonicalUrl = this.GetCanonicalUrl();
+            if (canonicalUrl != null)
+            {
+                return this.editUrl = canonicalUrl;
             }
 
             // compute edit url from parent
@@ -114,9 +122,11 @@ namespace Microsoft.OData.Evaluation
                 this.editUrl = new Uri(parent.GetEditUrl() + "/" + this.NameAsProperty, UriKind.RelativeOrAbsolute);
 
                 // Append possible type cast
-                if (this.ResourceMetadataContext.ActualResourceTypeName != this.ResourceMetadataContext.TypeContext.ExpectedResourceTypeName)
+                if (this.ResourceMetadataContext.ActualResourceTypeName !=
+                    this.ResourceMetadataContext.TypeContext.ExpectedResourceTypeName)
                 {
-                    this.editUrl = this.UriBuilder.AppendTypeSegment(editUrl, this.ResourceMetadataContext.ActualResourceTypeName);
+                    this.editUrl = this.UriBuilder.AppendTypeSegment(editUrl,
+                        this.ResourceMetadataContext.ActualResourceTypeName);
                 }
             }
 
@@ -171,7 +181,8 @@ namespace Microsoft.OData.Evaluation
                 if (this.ResourceMetadataContext.ActualResourceTypeName !=
                     this.ResourceMetadataContext.TypeContext.ExpectedResourceTypeName)
                 {
-                    this.readUrl = this.UriBuilder.AppendTypeSegment(readUrl, this.ResourceMetadataContext.ActualResourceTypeName);
+                    this.readUrl = this.UriBuilder.AppendTypeSegment(readUrl,
+                        this.ResourceMetadataContext.ActualResourceTypeName);
                 }
             }
 
@@ -222,7 +233,8 @@ namespace Microsoft.OData.Evaluation
                         typeContextWithModel.ExpectedResourceType.FindProperty(
                             this.NameAsProperty) == null)
                     {
-                        this.canonicalUrl = this.UriBuilder.AppendTypeSegment(canonicalUrl, parent.ResourceMetadataContext.ActualResourceTypeName);
+                        this.canonicalUrl = this.UriBuilder.AppendTypeSegment(canonicalUrl,
+                            parent.ResourceMetadataContext.ActualResourceTypeName);
                     }
                 }
 
