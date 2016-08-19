@@ -1049,6 +1049,7 @@ namespace Microsoft.OData.Tests
                 "\"ID\":\"abc\"," +
                 "\"Complex\":{" +
                     "\"Prop1\":123," +
+                    "\"ContainedUnderComplex@odata.context\":\"http://host/$metadata#Entities1('abc')/Complex/ContainedUnderComplex\"," +
                     "\"ContainedUnderComplex@odata.associationLink\":\"http://host/Entities1('abc')/Complex/ContainedUnderComplex/$ref\"," +
                     "\"ContainedUnderComplex@odata.navigationLink\":\"http://host/Entities1('abc')/Complex/ContainedUnderComplex\"," +
                     "\"ContainedUnderComplex\":[{" +
@@ -1091,8 +1092,7 @@ namespace Microsoft.OData.Tests
                 writer.WriteEnd();
             }, false, isFullMetadata: true);
 
-            // Since containment id can be computed in reader, the context url for containment under complex can be not written into payload.
-            Assert.False(output.Contains("\"ContainedUnderDerivedComplex@odata.context\":\"http://host/$metadata#Entities1('abc')/Complex/NS.DerivedComplexType/ContainedUnderDerivedComplex/$entity\""));
+            Assert.True(output.Contains("\"ContainedUnderDerivedComplex@odata.context\":\"http://host/$metadata#Entities1('abc')/Complex/NS.DerivedComplexType/ContainedUnderDerivedComplex/$entity\""));
             Assert.True(output.Contains("\"ContainedUnderDerivedComplex@odata.associationLink\":\"http://host/Entities1('abc')/Complex/NS.DerivedComplexType/ContainedUnderDerivedComplex/$ref\"," +
                                         "\"ContainedUnderDerivedComplex@odata.navigationLink\":\"http://host/Entities1('abc')/Complex/NS.DerivedComplexType/ContainedUnderDerivedComplex\""));
         }
@@ -1126,6 +1126,23 @@ namespace Microsoft.OData.Tests
             // Verify the id of contained entity
             Assert.True(output.Contains("\"@odata.id\":\"Entities1('abc')/Complex/ContainedUnderComplex('def')\""));
         }
+
+        [Fact]
+        public void ReadTopLevelComplexWithContainment()
+        {
+            var model = ContainmentComplexModel();
+            var complexType = model.FindType("NS.ComplexType") as IEdmComplexType;
+            string payload = "{" +
+               "\"@odata.context\":\"http://host/$metadata#Entities1('abc')/Complex\"," +
+                   "\"Prop1\":123," +
+                   "\"ContainedUnderComplex\":[{" +
+                       "\"ID\":\"def\"," +
+                       "\"NavUnderContained\":[{\"ID\":\"efg\"}]}]}";
+
+            var itemsList = ReadPayload(payload, model, null, complexType).OfType<ODataResource>().ToList();
+            itemsList[0].Id.Should().Be(new Uri("http://host/Entities2('efg')"));
+            itemsList[1].Id.Should().Be(new Uri("http://host/Entities1('abc')/Complex/ContainedUnderComplex('def')"));
+;        }
 
         #endregion
 

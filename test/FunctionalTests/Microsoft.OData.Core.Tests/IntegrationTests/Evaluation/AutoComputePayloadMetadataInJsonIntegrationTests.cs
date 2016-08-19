@@ -1009,7 +1009,7 @@ namespace Microsoft.OData.Tests.IntegrationTests.Evaluation
         }
 
         [Fact]
-        public void WritingInFullMetadataModeWithExpandWithContainedElementWillNotThrowExceptionIfODataPathIsNotSet()
+        public void WritingInFullMetadataModeWithExpandWithContainedElementShouldThrowExceptionIfODataPathIsNotSet()
         {
             ODataItem[] itemsToWrite = new ODataItem[]
             {
@@ -1023,7 +1023,7 @@ namespace Microsoft.OData.Tests.IntegrationTests.Evaluation
 
 
             Action test = () => this.GetWriterOutputForContentTypeAndKnobValue("application/json;odata.metadata=full", true, itemsToWrite, Model, EntitySet, EntityType, selectClause, expandClause);
-            test.ShouldNotThrow();
+            test.ShouldThrow<ODataException>().WithMessage(Strings.ODataWriterCore_PathInODataUriMustBeSetWhenWritingContainedElement);
         }
 
         [Fact]
@@ -1970,27 +1970,6 @@ namespace Microsoft.OData.Tests.IntegrationTests.Evaluation
 
             entry = entryList[1];
             entry.Id.Should().Be(new Uri("http://example.com/EntitySet(1)/AnotherContainedNonCollectionNavProp"));
-        }
-
-        [Fact]
-        public void ShouldThrowToAccessContainedIdIfParentIdAndContextUrlBothNotPresent()
-        {
-            const string payload =
-                "{" +
-                    "\"@odata.context\":\"http://example.com/$metadata#EntitySet/$entity\"," +
-                    "\"AnotherContainedNavProp\":[{\"ID\":123,\"Name\":\"Bob\"}]," +
-                    "\"AnotherContainedNonCollectionNavProp\":{\"ID\":123,\"Name\":\"Bob\"}" +
-                "}";
-
-            var entryList = ReadPayload(payload, EntitySet, EntityType);
-
-            ODataResource entry = entryList[0];
-            Action getId = () => entry.Id.Should().Be(new Uri(""));
-            getId.ShouldThrow<ODataException>().WithMessage(Strings.ODataMetadataBuilder_MissingParentIdOrContextUrl);
-
-            entry = entryList[1];
-            getId = () => entry.Id.Should().Be(new Uri(""));
-            getId.ShouldThrow<ODataException>().WithMessage(Strings.ODataMetadataBuilder_MissingParentIdOrContextUrl);
         }
 
         [Fact]

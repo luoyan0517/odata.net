@@ -1222,7 +1222,9 @@ namespace Microsoft.OData
                                 if (this.CurrentScope.NavigationSource == null)
                                 {
                                     IEdmPathExpression bindingPath;
-                                    this.CurrentScope.NavigationSource = parentNavigationSource == null ? null : parentNavigationSource.FindNavigationTarget(navigationProperty, BindingPathHelper.MatchBindingPath, this.CurrentScope.ODataUri.Path.ToList(), out bindingPath);
+                                    this.CurrentScope.NavigationSource = parentNavigationSource == null ?
+                                        null :
+                                        parentNavigationSource.FindNavigationTarget(navigationProperty, BindingPathHelper.MatchBindingPath, this.CurrentScope.ODataUri.Path.ToList(), out bindingPath);
                                 }
                             }
                         }
@@ -1418,9 +1420,10 @@ namespace Microsoft.OData
                         IEdmStructuredType currentResourceType = currentScope.ResourceType;
 
                         var resourceScope = currentScope as ResourceScope;
+                        TypeSegment resourceTypeCast = null;
                         if (resourceScope.ResourceTypeFromMetadata != currentResourceType)
                         {
-                            odataPath.Add(new TypeSegment(currentResourceType, currentResourceType, null));
+                            resourceTypeCast = new TypeSegment(currentResourceType, null);
                         }
 
                         var structuredProperty = this.WriterValidator.ValidatePropertyDefined(
@@ -1430,8 +1433,15 @@ namespace Microsoft.OData
                         // Handle complex type property.
                         if (structuredProperty != null)
                         {
+                            odataPath = AppendEntitySetKeySegment(odataPath, false);
                             resourceType = structuredProperty.Type.ToStructuredType();
                             navigationSource = null;
+
+                            if (resourceTypeCast != null)
+                            {
+                                odataPath.Add(resourceTypeCast);
+                            }
+
                             odataPath = odataPath.AppendPropertySegment(structuredProperty);
                         }
                         else
@@ -1443,9 +1453,14 @@ namespace Microsoft.OData
                                 IEdmNavigationSource currentNavigationSource = currentScope.NavigationSource;
                                 IEdmPathExpression bindingPath;
 
+                                if (resourceTypeCast != null)
+                                {
+                                    odataPath.Add(resourceTypeCast);
+                                }
+
                                 navigationSource = currentNavigationSource == null
                                     ? null
-                                    : currentNavigationSource.FindNavigationTarget(navigationProperty, BindingPathHelper.MatchBindingPath, this.CurrentScope.ODataUri.Path.ToList(), out bindingPath);
+                                    : currentNavigationSource.FindNavigationTarget(navigationProperty, BindingPathHelper.MatchBindingPath, odataPath.ToList(), out bindingPath);
 
                                 SelectExpandClause clause = odataUri.SelectAndExpand;
                                 TypeSegment typeCastFromExpand = null;
@@ -1459,20 +1474,13 @@ namespace Microsoft.OData
                                 switch (navigationSource.NavigationSourceKind())
                                 {
                                     case EdmNavigationSourceKind.ContainedEntitySet:
-                                        if (odataUri.Path == null)
+                                        // Containment cannot be written alone without odata uri.
+                                        if (odataPath.Count == 0)
                                         {
                                             throw new ODataException(Strings.ODataWriterCore_PathInODataUriMustBeSetWhenWritingContainedElement);
                                         }
 
-                                        if (ShouldAppendKey(currentNavigationSource, currentResourceType))
-                                        {
-                                            IEdmEntityType currentEntityType = currentResourceType as IEdmEntityType;
-                                            ODataItem odataItem = this.CurrentScope.Item;
-                                            ODataResource resource = odataItem as ODataResource;
-                                            Debug.Assert(resource != null, "If the current state is Resource the current item must be an ODataResource as well (and not null either).");
-                                            KeyValuePair<string, object>[] keys = ODataResourceMetadataContext.GetKeyProperties(resource, this.GetResourceSerializationInfo(resource), currentEntityType);
-                                            odataPath = odataPath.AppendKeySegment(keys, currentEntityType, currentNavigationSource);
-                                        }
+                                        odataPath = AppendEntitySetKeySegment(odataPath, true);
 
                                         if (odataPath != null && typeCastFromExpand != null)
                                         {
@@ -1508,12 +1516,46 @@ namespace Microsoft.OData
 
             if (navigationSource == null)
             {
-                navigationSource = this.CurrentScope.NavigationSource ?? odataUri.Path.BelongingNavigationSource();
+                navigationSource = this.CurrentScope.NavigationSource ?? odataUri.Path.TargetNavigationSource();
             }
 
             this.PushScope(newState, item, navigationSource, resourceType, skipWriting, selectedProperties, odataUri);
 
             this.NotifyListener(newState);
+        }
+
+        /// <summary>
+        /// Attempt to append key segment to ODataPath.
+        /// </summary>
+        /// <param name="odataPath">The ODataPath to be evaluated.</param>
+        /// <param name="throwIfFail">Whether throw if fails to append key segment.</param>
+        /// <returns>The new odata path.</returns>
+        private ODataPath AppendEntitySetKeySegment(ODataPath odataPath, bool throwIfFail)
+        {
+            ODataPath path = odataPath;
+
+            try
+            {
+                if (EdmExtensionMethods.HasKey(this.CurrentScope.NavigationSource, this.CurrentScope.ResourceType))
+                {
+                    IEdmEntityType currentEntityType = this.CurrentScope.ResourceType as IEdmEntityType;
+                    ODataResource resource = this.CurrentScope.Item as ODataResource;
+                    Debug.Assert(resource != null,
+                        "If the current state is Resource the current item must be an ODataResource as well (and not null either).");
+                    KeyValuePair<string, object>[] keys = ODataResourceMetadataContext.GetKeyProperties(resource,
+                        this.GetResourceSerializationInfo(resource), currentEntityType);
+                    path = path.AppendKeySegment(keys, currentEntityType, this.CurrentScope.NavigationSource);
+                }
+            }
+            catch (ODataException)
+            {
+                if (throwIfFail)
+                {
+                    throw;
+                }
+            }
+
+            return path;
         }
 
         /// <summary>
@@ -1723,33 +1765,6 @@ namespace Microsoft.OData
             {
                 return this.ParentResourceType != null && (this.ParentResourceType.FindProperty((this.CurrentScope.Item as ODataNestedResourceInfo).Name) == null);
             }
-        }
-
-        /// <summary>
-        /// Decide whether KeySegment should be appended to ODataPath for certain navigation source.
-        /// </summary>
-        /// <param name="currentNavigationSource">The navigation source to be evaluated.</param>
-        /// <param name="currentResourceType">The resource type to be evaluated.</param>
-        /// <returns>Boolean value indicating whether KeySegment should be appended</returns>
-        private static bool ShouldAppendKey(IEdmNavigationSource currentNavigationSource, IEdmStructuredType currentResourceType)
-        {
-            if (currentResourceType is IEdmComplexType)
-            {
-                return false;
-            }
-
-            if (currentNavigationSource is IEdmEntitySet)
-            {
-                return true;
-            }
-
-            var currentContainedEntitySet = currentNavigationSource as IEdmContainedEntitySet;
-            if (currentContainedEntitySet != null && currentContainedEntitySet.NavigationProperty.Type.TypeKind() == EdmTypeKind.Collection)
-            {
-                return true;
-            }
-
-            return false;
         }
 
         /// <summary>

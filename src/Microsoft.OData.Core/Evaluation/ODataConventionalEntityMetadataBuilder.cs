@@ -732,8 +732,8 @@ namespace Microsoft.OData.Evaluation
             while (nextToLastSegment is TypeSegment)
             {
                 ODataPathSegment previousSegment = segments[segments.Count - 2];
-                IEdmStructuredType ownerType = previousSegment.TargetEdmType as IEdmStructuredType;
-                if (ownerType != null && ownerType.FindProperty(lastSegment.Identifier) != null)
+                IEdmStructuredType owningType = previousSegment.TargetEdmType as IEdmStructuredType;
+                if (owningType != null && owningType.FindProperty(lastSegment.Identifier) != null)
                 {
                     segments.Remove(nextToLastSegment);
                     nextToLastSegment = segments.Last();
